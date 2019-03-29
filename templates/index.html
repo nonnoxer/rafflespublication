@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Raffles Publications</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-2'>
+        </div>
+        <div class='col-6 header'>
+          <h2>Raffles Publications</h2>
+          <div class='navbar'>
+            <a href='/'>Home</a>
+            <a href='/'>About Us</a>
+            <a href='/'>Works</a>
+          </div>
+        </div>
+        <div class='col-2 header'>
+          <h4>The eagle eye</h4>
+          <a href='/'>F</a>
+          <a href='/'>I</a>
+        </div>
+        <div class='col-2'>
+        </div>
+      </div>
+    </div>
+    <div>
+      <img src=' {{ url_for('static', filename='banner.jpeg') }}' width=100%>
+    </div>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-2'>
+        </div>
+        <div class='col-2 sidebar'>
+          <h4>Hi!</h4>
+          <p>Welcome to the Raffles Publications website! This is where we post our articles as well as make announcements. Hope you enjoy your stay!</p>
+          <div class='container'>
+            <div class='row'>
+              <div class='col-3 sidebar'>
+                <a href='/'>F</a>
+              </div>
+              <div class='col-3 sidebar'>
+                <a href='/'>P</a>
+              </div>
+              <div class='col-3 sidebar'>
+                <a href='/'>Y</a>
+              </div>
+              <div class='col-3 sidebar'>
+                <a href='/'>I</a>
+              </div>
+            </div>
+          </div>
+          <a href='/'>Read by Categories</a>
+          <h4>Feel free to drop some suggestions. We always welcome feedback.</h4>
+          <form action='POST'>
+            <input type='text' name='name' placeholder='Name'>
+            <input type='email' name='email' placeholder='Email'>
+            <input type='text' rows='4' name='message' placeholder='Your message'>
+            <input type='submit' name='Submit'>
+          </form>
+        </div>
+        <div class='col-6'>
+            <p class='body'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sollicitudin tortor at justo viverra finibus. Pellentesque pharetra orci in urna volutpat eleifend. Cras consequat ullamcorper tristique. Ut fringilla vel diam eget tincidunt. Vestibulum ipsum lectus, porta nec leo a, vulputate tempus enim. Sed cursus elementum sapien sit amet viverra. Quisque vulputate arcu nec sapien luctus consectetur. Nullam tempus interdum nisl, ut egestas magna ullamcorper a. Proin orci ligula, pellentesque id sapien nec, laoreet pulvinar elit. Vestibulum non molestie risus. Suspendisse efficitur dolor a nisi congue iaculis. Integer malesuada, diam gravida varius ultrices, leo lorem scelerisque sapien, vel pellentesque odio velit quis elit. Aenean nec nulla diam.</p>
+            <p class='body'>Nulla pellentesque dignissim enim sit. Est pellentesque elit ullamcorper dignissim cras tincidunt lobortis. Aliquet nec ullamcorper sit amet risus nullam eget. Mattis rhoncus urna neque viverra justo nec. Tristique risus nec feugiat in fermentum posuere urna nec. Tortor condimentum lacinia quis vel eros donec ac odio. Faucibus vitae aliquet nec ullamcorper sit amet risus. Quis enim lobortis scelerisque fermentum dui. Vel pharetra vel turpis nunc eget lorem. Mi in nulla posuere sollicitudin aliquam. Volutpat lacus laoreet non curabitur gravida arcu ac. Arcu bibendum at varius vel pharetra vel turpis nunc eget. Posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus. Pellentesque pulvinar pellentesque habitant morbi tristique senectus et. Vitae ultricies leo integer malesuada nunc vel risus commodo. Mauris vitae ultricies leo integer malesuada nunc vel. Dis parturient montes nascetur ridiculus mus.
+        <div class='col-2'>
+        </div>
+      </div>
+    </div>
+    <div class='footer'>
+      <p>Made by Chen Nuode and Natanael Tan from Raffles Institution Infocomm Club 2019</p>
+    </div>
+  </body>
+</html>

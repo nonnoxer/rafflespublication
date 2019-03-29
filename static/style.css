@@ -1,0 +1,16 @@
+body {
+  background-color: #014e44;
+}
+.header {
+  color: #aa8443;
+}
+.body {
+  background-color: white;
+}
+.sidebar {
+  color: white;
+}
+.footer {
+  color: white;
+  background-color: #013333;
+}
