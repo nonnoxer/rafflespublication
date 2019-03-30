@@ -1,11 +1,23 @@
 from flask import *
 import sqlite3 as sql
+import cloudconvert
+
 app = Flask(__name__)
 
 with sql.connect('databases/users.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
 with sql.connect('databases/posts.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS posts(post, title, categories, date);')
+
+api = cloudconvert.Api('rxHHtYriXYOWVPEq1p9oXRsA7n9S5aA6z97nUnAOSBNzq5KEHb08qfKEjrT4q1eL')
+docprocess = api.createProcess({
+    'inputformat': 'doc',
+    'outputformat': 'html'
+})
+docxprocess = api.createProcess({
+    'inputformat': 'docx',
+    'outputformat': 'html'
+})
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
