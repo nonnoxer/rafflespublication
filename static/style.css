@@ -2,6 +2,19 @@ p {
   padding: 0;
   margin: 0;
 }
+.orange {
+  background: none;
+  color: #aa8443;
+}
+.round {
+  border: 1px solid #aa8443;
+  border-radius: 100px;
+  padding: 5px;
+}
+.form {
+  border: none;
+  border-bottom: 1px solid #aa8443;
+}
 body {
   background-color: #014e44;
 }

@@ -1,23 +1,14 @@
 from flask import *
 import sqlite3 as sql
-import cloudconvert
+import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(32)
 
 with sql.connect('databases/users.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
 with sql.connect('databases/posts.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS posts(post, title, categories, date);')
-
-api = cloudconvert.Api('rxHHtYriXYOWVPEq1p9oXRsA7n9S5aA6z97nUnAOSBNzq5KEHb08qfKEjrT4q1eL')
-docprocess = api.createProcess({
-    'inputformat': 'doc',
-    'outputformat': 'html'
-})
-docxprocess = api.createProcess({
-    'inputformat': 'docx',
-    'outputformat': 'html'
-})
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -34,6 +25,7 @@ def admin():
         if results == None:
             return render_template('error.html', error='Invalid credentials')
         else:
+            session['user'] = username
             return render_template('admin.html')
 
 @app.route('/newuser', methods=['GET', 'POST'])
@@ -65,6 +57,27 @@ def signup():
 def mail():
     print('mailed')
     return render_template('index.html')
+
+@app.route('/delete', methods=['GET', 'POST'])
+def delete():
+    return render_template('delete.html')
+
+@app.route('/deleteuser', methods=['GET', 'POST'])
+def deleteuser():
+    if request.method == 'POST':
+        username = request.form['username']
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
+        if results == None:
+            return render_template('error.html', error='User does not exist')
+        if session['user'] == username:
+            return render_template('error.html', error='Cannot delete yourself')
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('DELETE FROM users WHERE username==?;', (username,))
+            conn.commit()
+        return render_template('admin.html', message='User deleted')
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():

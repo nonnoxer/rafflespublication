@@ -15,9 +15,9 @@
         <div class='col-6 header'>
           <h2>RAFFLES PUBLICATIONS</h2>
           <div class='navbar'>
-            <a href='/'>Home</a>
-            <a href='/'>About Us</a>
-            <a href='/'>Works</a>
+            <a href='/' class='orange'>Home</a>
+            <a href='/' class='orange'>About Us</a>
+            <a href='/' class='orange'>Works</a>
           </div>
         </div>
         <div class='col-2 header right'>
@@ -56,13 +56,15 @@
               </div>
             </div>
           </div>
-          <a href='/'>Read by Categories</a>
+          <br>
+          <a href='/' class='orange round'>Read by Categories</a>
+          <br>
           <h4>Feel free to drop some suggestions. We always welcome feedback.</h4>
           <form action='{{ url_for('mail') }}' method='POST'>
-            <input type='text' name='name' placeholder='Name'>
-            <input type='email' name='email' placeholder='Email'>
-            <input type='text' rows='4' name='message' placeholder='Your message'>
-            <input type='submit' name='Submit'>
+            <input type='text' name='name' placeholder='Name' class='orange form'>
+            <input type='email' name='email' placeholder='Email' class='orange form'>
+            <input type='text' name='message' placeholder='Your message' class='orange form'>
+            <input type='submit' name='Submit' class='orange round'>
           </form>
         </div>
         <div class='col-6'>
