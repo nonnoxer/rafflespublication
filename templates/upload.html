@@ -1,5 +1,10 @@
 <h1>Upload</h1>
-<form action='/uploaded' method='POST'>
-  <input type='file' name='file' accept='.docx,.doc*'>
+<form action='/uploaded' method='POST' id='upload'>
+  <input type='text' name='title' placeholder='Title'>
+  <br>
+  <input type='text' name='categories' placeholder='Categories'>
+  <br>
+  <textarea form='upload' name='text' rows='4'></textarea>
+  <br>
   <input type='submit' value='Upload'>
 </form>
