@@ -8,7 +8,7 @@ app.secret_key = os.urandom(32)
 with sql.connect('databases/users.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
 with sql.connect('databases/posts.db') as conn:
-    conn.execute('CREATE TABLE IF NOT EXISTS posts(post, title, categories, date);')
+    conn.execute('CREATE TABLE IF NOT EXISTS posts(title, categories, text);')
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -85,13 +85,39 @@ def upload():
 
 @app.route('/uploaded', methods=['GET', 'POST'])
 def uploaded():
+    title = request.form['title']
+    categories = request.form['categories']
+    text = request.form['text']
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        cur.execute('INSERT INTO posts VALUES (?,?,?);', (title, categories, text))
+        conn.commit()
     return render_template('admin.html', message='File uploaded')
+
+@app.route('/deletefile', methods=['GET', 'POST'])
+def deletefile():
+    return render_template('deletefile.html')
+
+@app.route('/deletedfile', methods=['GET', 'POST'])
+def deletedfile():
+    if request.method == 'POST':
+        filename = request.form['filename']
+        with sql.connect('databases/posts.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT title FROM posts WHERE title==?;', (filename,)).fetchone()
+        if results == None:
+            return render_template('error.html', error='File does not exist')
+        with sql.connect('databases/posts.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('DELETE FROM posts WHERE title==?;', (filename,))
+            conn.commit()
+        return render_template('admin.html', message='File deleted')
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    with sql.connect('databases/users.db') as conn:
+    with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
-        results = cur.execute('SELECT * FROM users;').fetchall()
+        results = cur.execute('SELECT * FROM posts;').fetchall()
     return str(results)
 
 app.run(debug=True)
