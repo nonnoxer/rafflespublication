@@ -3,7 +3,7 @@ import sqlite3 as sql
 import os
 
 app = Flask(__name__)
-app.secret_key = os.urandom(32)
+app.secret_key = os.urandom(24)
 
 with sql.connect('databases/users.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
@@ -113,11 +113,38 @@ def deletedfile():
             conn.commit()
         return render_template('admin.html', message='File deleted')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/works')
+def works():
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM posts;').fetchall()
+    result = []
+    for i in range(len(results)):
+        result.append(results.pop())
+    content = ''
+    for i in result:
+        content = content + '<a href="/' + i[0] + '">' + i[0] + '</a><br>'
+    return render_template('works.html', content=Markup(content))
+
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
         results = cur.execute('SELECT * FROM posts;').fetchall()
     return str(results)
+
+@app.route('/<title>')
+def serveFile(title):
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+    if results == []:
+        return render_template('content.html', title='Error', content='File does not exist')
+    else:
+        return render_template('content.html', title=results[0][0], content=results[0][2])
 
 app.run(debug=True)
