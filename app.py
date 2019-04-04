@@ -23,7 +23,7 @@ def admin():
             cur = conn.cursor()
             results = cur.execute('SELECT username FROM users WHERE username==? AND password==?;', (username, password)).fetchone()
         if results == None:
-            return render_template('error.html', error='Invalid credentials')
+            return render_template('login.html', error='Invalid credentials')
         else:
             session['user'] = username
             return render_template('admin.html')
@@ -58,9 +58,9 @@ def mail():
     print('mailed')
     return render_template('index.html')
 
-@app.route('/delete', methods=['GET', 'POST'])
+@app.route('/users', methods=['GET', 'POST'])
 def delete():
-    return render_template('delete.html')
+    return render_template('users.html')
 
 @app.route('/deleteuser', methods=['GET', 'POST'])
 def deleteuser():
@@ -79,11 +79,11 @@ def deleteuser():
             conn.commit()
         return render_template('admin.html', message='User deleted')
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/create', methods=['GET', 'POST'])
 def upload():
-    return render_template('upload.html')
+    return render_template('create.html')
 
-@app.route('/uploaded', methods=['GET', 'POST'])
+@app.route('/created', methods=['GET', 'POST'])
 def uploaded():
     title = request.form['title']
     categories = request.form['categories']
@@ -94,22 +94,38 @@ def uploaded():
         conn.commit()
     return render_template('admin.html', message='File uploaded')
 
-@app.route('/deletefile', methods=['GET', 'POST'])
-def deletefile():
-    return render_template('deletefile.html')
+@app.route('/files', methods=['GET', 'POST'])
+def files():
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM posts;').fetchall()
+    result = []
+    for i in range(len(results)):
+        result.append(results.pop())
+    content = ''
+    for i in result:
+        content = content + '<a href="/edit' + i[0] + '">' + i[0] + '</a><br>'
+    return render_template('files.html', content=Markup(content))
+
+@app.route('/editedfile', methods=['GET', 'POST'])
+def editedfile():
+    if request.method == 'POST':
+        title = request.form['title']
+        text = request.form['text']
+        return render_template('admin.html')
 
 @app.route('/deletedfile', methods=['GET', 'POST'])
 def deletedfile():
     if request.method == 'POST':
-        filename = request.form['filename']
+        title = request.form['title']
         with sql.connect('databases/posts.db') as conn:
             cur = conn.cursor()
-            results = cur.execute('SELECT title FROM posts WHERE title==?;', (filename,)).fetchone()
+            results = cur.execute('SELECT title FROM posts WHERE title==?;', (title,)).fetchone()
         if results == None:
             return render_template('error.html', error='File does not exist')
         with sql.connect('databases/posts.db') as conn:
             cur = conn.cursor()
-            results = cur.execute('DELETE FROM posts WHERE title==?;', (filename,))
+            results = cur.execute('DELETE FROM posts WHERE title==?;', (title,))
             conn.commit()
         return render_template('admin.html', message='File deleted')
 
@@ -137,6 +153,13 @@ def test():
         results = cur.execute('SELECT * FROM posts;').fetchall()
     return str(results)
 
+@app.route('/edit<title>')
+def editFile(title):
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+    return render_template('file.html', title=title, content=results[0][2])
+
 @app.route('/<title>')
 def serveFile(title):
     with sql.connect('databases/posts.db') as conn:
@@ -145,6 +168,8 @@ def serveFile(title):
     if results == []:
         return render_template('content.html', title='Error', content='File does not exist')
     else:
-        return render_template('content.html', title=results[0][0], content=results[0][2])
+        results[0] = list(results[0])
+        results[0][2] = results[0][2].replace('\r\n', '<br>')
+        return render_template('content.html', title=results[0][0], content=Markup(results[0][2]))
 
 app.run(debug=True)
