@@ -60,7 +60,13 @@ def mail():
 
 @app.route('/users', methods=['GET', 'POST'])
 def delete():
-    return render_template('users.html')
+    with sql.connect('databases/users.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM users;').fetchall()
+    users = ''
+    for i in results:
+        users = users + i[0] + ',' + i[1] + '<br>'
+    return render_template('users.html', users=Markup(users))
 
 @app.route('/deleteuser', methods=['GET', 'POST'])
 def deleteuser():
@@ -87,6 +93,8 @@ def upload():
 def uploaded():
     title = request.form['title']
     categories = request.form['categories']
+    if categories == '':
+        categories = 'Uncategorised'
     text = request.form['text']
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
@@ -157,7 +165,7 @@ def editFile(title):
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
         results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-    return render_template('file.html', title=results[0][0], content=results[0][2])
+    return render_template('file.html', title=results[0][0], categories=results[0][1], content=results[0][2])
 
 @app.route('/<title>')
 def serveFile(title):
@@ -169,6 +177,6 @@ def serveFile(title):
     else:
         results[0] = list(results[0])
         results[0][2] = results[0][2].replace('\r\n', '<br>')
-        return render_template('content.html', title=results[0][0], content=Markup(results[0][2]))
+        return render_template('content.html', title=results[0][0], categories=results[0][1], content=Markup(results[0][2]))
 
 app.run(debug=True)
