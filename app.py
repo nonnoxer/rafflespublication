@@ -112,17 +112,16 @@ def editedfile():
     if request.method == 'POST':
         title = request.form['title']
         text = request.form['text']
-        return render_template('admin.html')
+        with sql.connect('databases/posts.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('UPDATE posts SET text=? WHERE title==?;', (text, title))
+            conn.commit()
+        return render_template('admin.html', message='File edited')
 
 @app.route('/deletedfile', methods=['GET', 'POST'])
 def deletedfile():
     if request.method == 'POST':
         title = request.form['title']
-        with sql.connect('databases/posts.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('SELECT title FROM posts WHERE title==?;', (title,)).fetchone()
-        if results == None:
-            return render_template('error.html', error='File does not exist')
         with sql.connect('databases/posts.db') as conn:
             cur = conn.cursor()
             results = cur.execute('DELETE FROM posts WHERE title==?;', (title,))
@@ -158,7 +157,7 @@ def editFile(title):
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
         results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-    return render_template('file.html', title=title, content=results[0][2])
+    return render_template('file.html', title=results[0][0], content=results[0][2])
 
 @app.route('/<title>')
 def serveFile(title):
