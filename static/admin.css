@@ -1,0 +1,34 @@
+* {
+  padding: 0px;
+  margin: 0px;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+p {
+  padding: 0;
+  margin: 0;
+}
+.header {
+  color: #191919;
+  background-color: #f1f3f5;
+  padding: 10px;
+  font-size: 18px;
+}
+.body {
+  background-color: white;
+}
+button {
+  background: None;
+  border: None;
+  color: #191919;
+  padding: 15px;
+}
+button:focus {
+  background: None;
+  border: None;
+  color: white;
+  padding: 15px;
+  background-color: #efbf32;
+}
+table, th, td {
+  border: 1px solid black;
+}

@@ -1,6 +1,25 @@
-<h1>Admin interface</h1>
-<p><a href='/signup'>New user</a></p>
-<p><a href='/users'>View users</a></p>
-<p><a href='/create'>Create file</a></p>
-<p><a href='/files'>View files</a></p>
-<p>{{ message }}</p>
+<!DOCTYPE html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+  <div class='container' min-height='100%'>
+    <div class='row'>
+      <div class='col-3 header'>
+        <p>ADMIN</p>
+        <button onclick='userActions()'>User actions</button>
+        <br>
+        <button onclick='postActions()'>Post actions</button>
+      </div>
+      <div class='col-9'>
+        <br>
+        <p id='panel'</p>
+        <br>
+        <p>{{ message }}</p>
+      </div>
+    </div>
+  </div>
+</body>

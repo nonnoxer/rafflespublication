@@ -65,8 +65,17 @@ def delete():
         results = cur.execute('SELECT * FROM users;').fetchall()
     users = ''
     for i in results:
-        users = users + i[0] + ',' + i[1] + '<br>'
+        users = users + """<tr><form action='/edituser' method='POST'>
+                <td><input type='text' name='username' readonly value='""" + i[0] + """'></td>
+                <td><input type=password name='password' value='""" + i[1] + """'></td>
+                <td><input type='submit' name='update' value='Update password'></td>
+                <td><input type='submit' name='delete' value='Delete'></td>
+                </form></tr>"""
     return render_template('users.html', users=Markup(users))
+
+@app.route('/edituser', methods=['GET', 'POST'])
+def edituser():
+    return 'edited user'
 
 @app.route('/deleteuser', methods=['GET', 'POST'])
 def deleteuser():
