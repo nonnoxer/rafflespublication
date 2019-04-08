@@ -65,19 +65,40 @@ def delete():
         results = cur.execute('SELECT * FROM users;').fetchall()
     users = ''
     for i in results:
-        users = users + """<tr><form action='/edituser' method='POST'>
-                <td><input type='text' name='username' readonly value='""" + i[0] + """'></td>
-                <td><input type=password name='password' value='""" + i[1] + """'></td>
-                <td><input type='submit' name='update' value='Update password'></td>
-                <td><input type='submit' name='delete' value='Delete'></td>
-                </form></tr>"""
+        users = users + '<a href="/user' + i[0] + '">' + i[0] + '</a><br>'
     return render_template('users.html', users=Markup(users))
 
-@app.route('/edituser', methods=['GET', 'POST'])
-def edituser():
-    return 'edited user'
+@app.route('/editedusername', methods=['GET', 'POST'])
+def editedusername():
+    if request.method == 'POST':
+        username = request.form['username']
+        newname = request.form['newname']
+        password = request.form['password']
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            cur.execute('UPDATE users SET username=? WHERE username==?', (newname, username))
+            conn.commit()
+        return render_template('admin.html', message='User updated')
 
-@app.route('/deleteuser', methods=['GET', 'POST'])
+@app.route('/editedpassword', methods=['GET', 'POST'])
+def editedpassword():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        newpass = request.form['newpass']
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            cur.execute('UPDATE users SET password=? WHERE username==?', (newpass, username))
+            conn.commit()
+        return render_template('admin.html', message='User updated')
+
+@app.route('/deleteduser', methods=['GET', 'POST'])
 def deleteuser():
     if request.method == 'POST':
         username = request.form['username']
@@ -86,8 +107,6 @@ def deleteuser():
             results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
         if results == None:
             return render_template('error.html', error='User does not exist')
-        if session['user'] == username:
-            return render_template('error.html', error='Cannot delete yourself')
         with sql.connect('databases/users.db') as conn:
             cur = conn.cursor()
             results = cur.execute('DELETE FROM users WHERE username==?;', (username,))
@@ -128,10 +147,11 @@ def files():
 def editedfile():
     if request.method == 'POST':
         title = request.form['title']
+        categories = request.form['categories']
         text = request.form['text']
         with sql.connect('databases/posts.db') as conn:
             cur = conn.cursor()
-            results = cur.execute('UPDATE posts SET text=? WHERE title==?;', (text, title))
+            results = cur.execute('UPDATE posts SET text=?, categories=? WHERE title==?;', (text, categories, title))
             conn.commit()
         return render_template('admin.html', message='File edited')
 
@@ -175,6 +195,13 @@ def editFile(title):
         cur = conn.cursor()
         results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
     return render_template('file.html', title=results[0][0], categories=results[0][1], content=results[0][2])
+
+@app.route('/user<username>')
+def edituser(username):
+    with sql.connect('databases/users.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
+    return render_template('user.html', username=results[0])
 
 @app.route('/<title>')
 def serveFile(title):
