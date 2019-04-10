@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Raffles Publications</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href='{{ url_for('static', filename='favicon.ico') }}' />
+  </head>
+  <body>
+    <br>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-2'>
+        </div>
+        <div class='col-6 header'>
+          <h2>RAFFLES PUBLICATIONS</h2>
+          <div class='navbar'>
+            <a href='/' class='orange'>Home</a>
+            <a href='/about' class='orange'>About Us</a>
+            <a href='/works' class='orange'>Works</a>
+          </div>
+        </div>
+        <div class='col-2 header right'>
+          <h6>THE EAGLE EYE</h6>
+          <a href='https://www.facebook.com/Raffles-Publications-1437480963198257/'><img src=' {{ url_for('static', filename='facebook.png') }}' width=15%></a>
+          <a href='https://www.ri.edu.sg/'><img src=' {{url_for('static', filename='instagram.png') }}' width=15%></a>
+        </div>
+        <div class='col-2'>
+        </div>
+      </div>
+    </div>
+    <div>
+      <img src=' {{ url_for('static', filename='banner.jpeg') }}' width=100%>
+    </div>
+    <br>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-2'>
+        </div>
+        <div class='col-8 body'>
+          <h1>Categories</h1>
+          {{ categories }}
+        </div>
+        <div class='col-2'>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class='footer centre'>
+      <br>
+      <p>Made by Chen Nuode and Natanael Tan from Raffles Institution Infocomm Club 2019</p>
+      <p class='centre'><a href='/admin'>Admin login</a></p>
+      <br>
+    </div>
+  </body>
+</html>

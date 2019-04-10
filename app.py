@@ -9,6 +9,8 @@ with sql.connect('databases/users.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
 with sql.connect('databases/posts.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS posts(title, categories, text);')
+with sql.connect('databases/pages.db') as conn:
+    conn.execute('CREATE TABLE IF NOT EXISTS pages(title, content);')
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -184,6 +186,20 @@ def works():
         content = content + '<a href="/' + i[0] + '">' + i[0] + '</a><br>'
     return render_template('works.html', content=Markup(content))
 
+@app.route('/categories')
+def categories():
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT categories FROM posts;').fetchall()
+    result = []
+    categories = ''
+    for i in results:
+        if i[0] not in result:
+            result.append(i[0])
+    for i in result:
+        categories = categories + '<a href="/category' + i + '">' + i + '</a><br>'
+    return render_template('categories.html', categories=Markup(categories))
+
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     with sql.connect('databases/posts.db') as conn:
@@ -204,6 +220,16 @@ def edituser(username):
         cur = conn.cursor()
         results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
     return render_template('user.html', username=results[0])
+
+@app.route('/category<category>')
+def category(category):
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM posts WHERE categories=?', (category,)).fetchall()
+    content = ''
+    for i in results:
+        content = content + '<a href="/' + i[0] + '">' + i[0] + '</a><br>'
+    return render_template('category.html', category=category, content=Markup(content))
 
 @app.route('/<title>')
 def serveFile(title):
