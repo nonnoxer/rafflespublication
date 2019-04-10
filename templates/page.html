@@ -10,7 +10,7 @@
 <body>
   <h1>{{ title }}</h1>
   <p>Edit</p>
-  <form action='/editedfile' method='POST' id='editor'>
+  <form action='/editedpage' method='POST' id='editor'>
     <input type='text' name='title' readonly value='{{ title }}'>
     <br>
     <input type='text' name='categories' value='{{ categories }}' placeholder='Categories'>
@@ -22,7 +22,7 @@
     <input type='submit' value='Edit'>
   </form>
   <p>Delete</p>
-  <form action='/deletedfile' method='POST'>
+  <form action='/deletedpage' method='POST'>
     <input type='text' name='title' readonly value='{{ title }}'>
     <br>
     <input type='submit' value='Delete'>
