@@ -16,17 +16,10 @@ def root():
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        with sql.connect('databases/users.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('SELECT username FROM users WHERE username==? AND password==?;', (username, password)).fetchone()
-        if results == None:
-            return render_template('login.html', error='Invalid credentials')
-        else:
-            session['user'] = username
-            return render_template('admin.html')
+    if 'user' in session:
+        return render_template('admin.html')
+    else:
+        return render_template('login.html')
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
@@ -47,7 +40,17 @@ def newuser():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT username FROM users WHERE username==? AND password==?;', (username, password)).fetchone()
+        if results == None:
+            return render_template('login.html', error='Invalid credentials')
+        else:
+            session['user'] = username
+            return redirect('/admin')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -73,7 +76,6 @@ def editedusername():
     if request.method == 'POST':
         username = request.form['username']
         newname = request.form['newname']
-        password = request.form['password']
         with sql.connect('databases/users.db') as conn:
             cur = conn.cursor()
             results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
@@ -81,7 +83,7 @@ def editedusername():
             cur = conn.cursor()
             cur.execute('UPDATE users SET username=? WHERE username==?', (newname, username))
             conn.commit()
-        return render_template('admin.html', message='User updated')
+        return redirect('/admin')
 
 @app.route('/editedpassword', methods=['GET', 'POST'])
 def editedpassword():
@@ -96,7 +98,7 @@ def editedpassword():
             cur = conn.cursor()
             cur.execute('UPDATE users SET password=? WHERE username==?', (newpass, username))
             conn.commit()
-        return render_template('admin.html', message='User updated')
+        return redirect('/admin')
 
 @app.route('/deleteduser', methods=['GET', 'POST'])
 def deleteuser():
@@ -111,7 +113,7 @@ def deleteuser():
             cur = conn.cursor()
             results = cur.execute('DELETE FROM users WHERE username==?;', (username,))
             conn.commit()
-        return render_template('admin.html', message='User deleted')
+        return redirect('/admin')
 
 @app.route('/create', methods=['GET', 'POST'])
 def upload():
@@ -128,7 +130,7 @@ def uploaded():
         cur = conn.cursor()
         cur.execute('INSERT INTO posts VALUES (?,?,?);', (title, categories, text))
         conn.commit()
-    return render_template('admin.html', message='File uploaded')
+    return redirect('/admin')
 
 @app.route('/files', methods=['GET', 'POST'])
 def files():
@@ -153,7 +155,7 @@ def editedfile():
             cur = conn.cursor()
             results = cur.execute('UPDATE posts SET text=?, categories=? WHERE title==?;', (text, categories, title))
             conn.commit()
-        return render_template('admin.html', message='File edited')
+        return redirect('/admin')
 
 @app.route('/deletedfile', methods=['GET', 'POST'])
 def deletedfile():
@@ -163,7 +165,7 @@ def deletedfile():
             cur = conn.cursor()
             results = cur.execute('DELETE FROM posts WHERE title==?;', (title,))
             conn.commit()
-        return render_template('admin.html', message='File deleted')
+        return redirect('/admin')
 
 @app.route('/about')
 def about():
