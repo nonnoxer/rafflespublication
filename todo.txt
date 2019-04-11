@@ -1,3 +1,0 @@
-Improve the admin interface so deleting stuff is actually possible
-Make sure the admin interface is secure using sessions or some stuff like that
-Implement categories successfully

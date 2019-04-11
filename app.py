@@ -8,13 +8,23 @@ app.secret_key = os.urandom(24)
 with sql.connect('databases/users.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
 with sql.connect('databases/posts.db') as conn:
-    conn.execute('CREATE TABLE IF NOT EXISTS posts(title, categories, text);')
+    conn.execute('CREATE TABLE IF NOT EXISTS posts(title, categories, text, summary);')
 with sql.connect('databases/pages.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS pages(title, text);')
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
-    return render_template('index.html')
+    with sql.connect('databases/posts.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM posts;').fetchall()
+    result = []
+    for i in range(3):
+        if len(results) > 0:
+            result.append(results.pop())
+    content = ''
+    for i in result:
+        content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
+    return render_template('index.html', content=Markup(content))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -130,9 +140,10 @@ def createdpost():
     if categories == '':
         categories = 'Uncategorised'
     text = request.form['text']
+    summary = request.form['summary']
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
-        cur.execute('INSERT INTO posts VALUES (?,?,?);', (title, categories, text))
+        cur.execute('INSERT INTO posts VALUES (?,?,?,?);', (title, categories, text, summary))
         conn.commit()
     return redirect('/admin')
 
@@ -154,7 +165,7 @@ def editpost(title):
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
         results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-    return render_template('post.html', title=results[0][0], categories=results[0][1], content=results[0][2])
+    return render_template('post.html', title=results[0][0], categories=results[0][1], content=results[0][2], summary=results[0][3])
 
 @app.route('/editedpost', methods=['GET', 'POST'])
 def editedpost():
@@ -162,9 +173,10 @@ def editedpost():
         title = request.form['title']
         categories = request.form['categories']
         text = request.form['text']
+        summary = request.form['summary']
         with sql.connect('databases/posts.db') as conn:
             cur = conn.cursor()
-            results = cur.execute('UPDATE posts SET text=?, categories=? WHERE title==?;', (text, categories, title))
+            results = cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
             conn.commit()
         return redirect('/admin')
 
@@ -243,7 +255,7 @@ def works():
         result.append(results.pop())
     content = ''
     for i in result:
-        content = content + '<a href="/' + i[0] + '">' + i[0] + '</a><br>'
+        content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
     return render_template('content.html', title='Works', content=Markup(content))
 
 @app.route('/Categories')
@@ -267,7 +279,7 @@ def category(category):
         results = cur.execute('SELECT * FROM posts WHERE categories=?', (category,)).fetchall()
     content = ''
     for i in results:
-        content = content + '<a href="/' + i[0] + '">' + i[0] + '</a><br>'
+        content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
     return render_template('content.html', title=category, content=Markup(content))
 
 @app.route('/All')
@@ -285,7 +297,7 @@ def other():
 def test():
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
-        results = cur.execute('SELECT * FROM posts;').fetchall()
+        results = cur.execute('SELECT * FROM posts DESC LIMIT 3;').fetchall()
     return str(results)
 
 @app.route('/mail', methods=['GET', 'POST'])
