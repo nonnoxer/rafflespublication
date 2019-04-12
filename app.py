@@ -277,6 +277,7 @@ def categories():
         i = list(i)
         i[0] = i[0].split(',')
         for j in i[0]:
+            j = j.strip()
             if j not in result:
                 result.append(j)
     categories = ''
@@ -326,15 +327,35 @@ def test():
 
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
-    if method == 'POST':
+    if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         feedback = request.form['feedback']
         with sql.connect('databases/feedback.db') as conn:
             cur = conn.cursor()
-            cur.execute('INSERT INTO feeback VALUES (?,?,?);', (name, email, feedback))
+            cur.execute('INSERT INTO feedback VALUES (?,?,?);', (name, email, feedback))
             conn.commit()
         return redirect('/')
+
+@app.route('/feedbacked')
+def feedbacked():
+    with sql.connect('databases/feedback.db') as conn:
+        cur = conn.cursor()
+        results = cur.execute('SELECT * FROM feedback;').fetchall()
+    feedback = ''
+    for i in results:
+        feedback = feedback + "<tr><form action='deletedfeedback' method='POST' id='feedbacker'><td>" + i[0] + "</td><td>" + i[1] + "</td><td><textarea form='feedbacker' name='feedback' rows='4' readonly>" + i[2] + "</textarea></td><td><input type='submit' value='Delete'></form></tr>"
+    return render_template('feedback.html', feedback=Markup(feedback))
+
+@app.route('/deletedfeedback', methods=['GET', 'POST'])
+def deletedfeedback():
+    if request.method == 'POST':
+        feedback = request.form['feedback']
+        with sql.connect('databases/feedback.db') as conn:
+            cur = conn.cursor()
+            cur.execute('DELETE FROM feedback WHERE feedback==?;', (feedback,))
+            conn.commit()
+        return redirect('/admin')
 
 @app.route('/<title>')
 def serveFile(title):

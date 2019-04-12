@@ -61,10 +61,10 @@
           <a href='/categories' class='orange round'>Read by Categories</a>
           <br>
           <h4>Feel free to drop some suggestions. We always welcome feedback.</h4>
-          <form action='/feedback' method='POST'>
+          <form action='/feedback' method='POST' id='feedback'>
             <input type='text' name='name' placeholder='Name' class='orange form'>
             <input type='email' name='email' placeholder='Email' class='orange form'>
-            <input type='text' name='feedback' placeholder='Your message' class='orange form'>
+            <textarea form='feedback' name='feedback' placeholder='Your message' class='orange form' rows='4'></textarea>
             <input type='submit' name='Submit' class='orange round'>
           </form>
         </div>

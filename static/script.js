@@ -7,3 +7,6 @@ function postActions() {
 function pageActions() {
   $('#panel').html("<a class='round' href='/createpage'>New page</a><br><a class='round' href='/pages'>View pages</a>");
 };
+function feedback() {
+  $('#panel').html("<a class='round' href='/feedbacked'>Feedback</a>");
+}
