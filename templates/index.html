@@ -17,8 +17,8 @@
           <div class='navbar'>
             <a href='/' class='orange'>Home</a>
             <a href='/About' class='orange'>About</a>
-            <a href='/Works' class='orange'>Works</a>
-            <a href='/All' class='orange'>All Pages</a>
+            <a href='/works' class='orange'>Works</a>
+            <a href='/all' class='orange'>All Pages</a>
           </div>
         </div>
         <div class='col-2 header right'>
@@ -58,13 +58,13 @@
             </div>
           </div>
           <br>
-          <a href='/Categories' class='orange round'>Read by Categories</a>
+          <a href='/categories' class='orange round'>Read by Categories</a>
           <br>
           <h4>Feel free to drop some suggestions. We always welcome feedback.</h4>
-          <form action='{{ url_for('mail') }}' method='POST'>
+          <form action='/feedback' method='POST'>
             <input type='text' name='name' placeholder='Name' class='orange form'>
             <input type='email' name='email' placeholder='Email' class='orange form'>
-            <input type='text' name='message' placeholder='Your message' class='orange form'>
+            <input type='text' name='feedback' placeholder='Your message' class='orange form'>
             <input type='submit' name='Submit' class='orange round'>
           </form>
         </div>
@@ -72,7 +72,7 @@
           <div class='body'>
             <h1>Recent Posts</h1>
             {{ content }}
-            <a href='/Works'>More...</a>
+            <a href='/works'>More...</a>
           </div>
         </div>
         <div class='col-2'>

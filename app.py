@@ -11,6 +11,8 @@ with sql.connect('databases/posts.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS posts(title, categories, text, summary);')
 with sql.connect('databases/pages.db') as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS pages(title, text);')
+with sql.connect('databases/feedback.db') as conn:
+    conn.execute('CREATE TABLE IF NOT EXISTS feedback(name, email, feedback);')
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -141,6 +143,8 @@ def createdpost():
         categories = 'Uncategorised'
     text = request.form['text']
     summary = request.form['summary']
+    if summary == '':
+        summary = text[:text.find('\r\n')]
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
         cur.execute('INSERT INTO posts VALUES (?,?,?,?);', (title, categories, text, summary))
@@ -174,6 +178,11 @@ def editedpost():
         categories = request.form['categories']
         text = request.form['text']
         summary = request.form['summary']
+        if summary == '':
+            if text.find('\r\n') != -1:
+                summary = text[:text.find('\r\n')]
+            else:
+                summary = text
         with sql.connect('databases/posts.db') as conn:
             cur = conn.cursor()
             results = cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
@@ -245,7 +254,7 @@ def deletedpage():
             conn.commit()
         return redirect('/admin')
 
-@app.route('/Works')
+@app.route('/works')
 def works():
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
@@ -258,16 +267,19 @@ def works():
         content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
     return render_template('content.html', title='Works', content=Markup(content))
 
-@app.route('/Categories')
+@app.route('/categories')
 def categories():
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
         results = cur.execute('SELECT categories FROM posts;').fetchall()
     result = []
-    categories = ''
     for i in results:
-        if i[0] not in result:
-            result.append(i[0])
+        i = list(i)
+        i[0] = i[0].split(',')
+        for j in i[0]:
+            if j not in result:
+                result.append(j)
+    categories = ''
     for i in result:
         categories = categories + '<a href="/category' + i + '">' + i + '</a><br>'
     return render_template('content.html', title='Categories', content=Markup(categories))
@@ -276,15 +288,20 @@ def categories():
 def category(category):
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
-        results = cur.execute('SELECT * FROM posts WHERE categories=?', (category,)).fetchall()
+        results = cur.execute('SELECT * FROM posts;').fetchall()
+    result = []
     content = ''
     for i in results:
-        content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
+        i = list(i)
+        i[1] = i[1].split(',')
+        for j in i[1]:
+            if category in j:
+                content = '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>' + content
     return render_template('content.html', title=category, content=Markup(content))
 
-@app.route('/All')
+@app.route('/all')
 def other():
-    content = '<a href="/">Home</a><br><a href="/About">About</a><br><a href="/Works">Works</a><br><a href="Categories">Categories</a><br>'
+    content = '<a href="/">Home</a><br><a href="/About">About</a><br><a href="/works">Works</a><br><a href="/categories">Categories</a><br>'
     with sql.connect('databases/pages.db') as conn:
         cur = conn.cursor()
         results = cur.execute('SELECT * FROM pages').fetchall()
@@ -297,13 +314,27 @@ def other():
 def test():
     with sql.connect('databases/posts.db') as conn:
         cur = conn.cursor()
-        results = cur.execute('SELECT * FROM posts DESC LIMIT 3;').fetchall()
+        results = cur.execute('SELECT categories FROM posts;').fetchall()
+    result = []
+    for i in results:
+        i = list(i)
+        i[0] = i[0].split(',')
+        for j in i[0]:
+            if j not in result:
+                result.append(j)
     return str(results)
 
-@app.route('/mail', methods=['GET', 'POST'])
-def mail():
-    print('mailed')
-    return render_template('index.html')
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback():
+    if method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        feedback = request.form['feedback']
+        with sql.connect('databases/feedback.db') as conn:
+            cur = conn.cursor()
+            cur.execute('INSERT INTO feeback VALUES (?,?,?);', (name, email, feedback))
+            conn.commit()
+        return redirect('/')
 
 @app.route('/<title>')
 def serveFile(title):
@@ -323,6 +354,7 @@ def serveFile(title):
     else:
         results[0] = list(results[0])
         results[0][2] = results[0][2].replace('\r\n', '<br>')
-        return render_template('content.html', title=results[0][0], categories=results[0][1], content=Markup(results[0][2]))
+        categories = '<p><strong>Categories: </strong>' + results[0][1] + '</p>'
+        return render_template('content.html', title=results[0][0], content=Markup(categories + results[0][2]))
 
 app.run(debug=True)
