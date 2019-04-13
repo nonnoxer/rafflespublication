@@ -141,6 +141,9 @@ def createdpost():
     categories = request.form['categories']
     if categories == '':
         categories = 'Uncategorised'
+    else:
+        categories = categories.replace(' ,', ',')
+        categories = categories.replace(', ', ',')
     text = request.form['text']
     summary = request.form['summary']
     if summary == '':
@@ -176,6 +179,11 @@ def editedpost():
     if request.method == 'POST':
         title = request.form['title']
         categories = request.form['categories']
+        if categories == '':
+            categories = 'Uncategorised'
+        else:
+            categories = categories.replace(' ,', ',')
+            categories = categories.replace(', ', ',')
         text = request.form['text']
         summary = request.form['summary']
         if summary == '':
@@ -375,7 +383,11 @@ def serveFile(title):
     else:
         results[0] = list(results[0])
         results[0][2] = results[0][2].replace('\r\n', '<br>')
-        categories = '<p><strong>Categories: </strong>' + results[0][1] + '</p>'
+        results[0][1] = results[0][1].split(',')
+        categories = '<p><strong>Categories: </strong>'
+        for i in results[0][1]:
+            categories = categories + "<a href='/category" +  i + "'>" + i + '</a>, '
+        categories = categories[:len(categories) - 2] + '</p>'
         return render_template('content.html', title=results[0][0], content=Markup(categories + results[0][2]))
 
 app.run(debug=True)
