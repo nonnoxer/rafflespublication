@@ -16,9 +16,8 @@
     <input type='text' name='categories' value='{{ categories }}' placeholder='Categories'>
     <br>
     <div id='editor-container'>
-      {{ content }}
     </div>
-    <textarea form='editor' name='text' rows='0' cols='0' readonly></textarea>
+    <textarea form='editor' name='text' readonly hidden></textarea>
     <textarea form='editor' name='summary' rows='4' cols='16' placeholder='Summary'>{{ summary }}</textarea>
     <br>
     <button onclick='dewit()'>Edit</button>
@@ -29,5 +28,8 @@
     <br>
     <input type='submit' value='Delete'>
   </form>
-  <script src='{{ url_for('static', filename='quillscript.js') }}'></script>
+  <script src='{{ url_for('static', filename='quillscript.js') }}'>
+    var lne = {{ contents|safe }};
+    recall(lne_);
+  </script>
 </body>

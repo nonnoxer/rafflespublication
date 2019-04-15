@@ -11,5 +11,8 @@ var quill = new Quill('#editor-container', {
 function dewit() {
   form = document.getElementById('editor');
   $("textarea[name='text']").html(quill.root.innerHTML);
-  form.submit()
+  form.submit();
+}
+function recall(lne) {
+  quill.setContents(convertHtmlToDelta(lne));
 }
