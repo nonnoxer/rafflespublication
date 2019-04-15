@@ -8,3 +8,8 @@ var quill = new Quill('#editor-container', {
   placeholder: 'Compose an epic...',
   theme: 'snow'  // or 'bubble'
 });
+function dewit() {
+  form = document.getElementById('editor');
+  $("textarea[name='text']").html(quill.root.innerHTML);
+  form.submit()
+}

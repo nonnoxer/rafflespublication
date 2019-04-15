@@ -16,12 +16,12 @@
     <input type='text' name='categories' value='{{ categories }}' placeholder='Categories'>
     <br>
     <div id='editor-container'>
+      {{ content }}
     </div>
-    <textarea form='editor' name='text' rows='16' cols='64' placeholder='Content'>{{ content }}</textarea>
+    <textarea form='editor' name='text' rows='0' cols='0' readonly></textarea>
+    <textarea form='editor' name='summary' rows='4' cols='16' placeholder='Summary'>{{ summary }}</textarea>
     <br>
-    <textarea form='editor' name='summary' rows='4' cols='64' placeholder='Summary'>{{ summary }}</textarea>
-    <br>
-    <input type='submit' value='Edit'>
+    <button onclick='dewit()'>Edit</button>
   </form>
   <p>Delete</p>
   <form action='/deletedpost' method='POST'>
