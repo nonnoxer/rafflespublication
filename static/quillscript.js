@@ -8,3 +8,10 @@ var quill = new Quill('#editor-container', {
   placeholder: 'Compose an epic...',
   theme: 'snow'  // or 'bubble'
 });
+
+var QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
+
+function htmlise(form) {
+  $('#text').html("<textarea form='editor' name='text'>" + quill.getContents() + "</textarea>")
+  document.form.submit()
+}
