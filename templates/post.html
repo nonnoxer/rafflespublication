@@ -7,7 +7,7 @@
   <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
 </head>
-<body>
+<body onload='lne()'>
   <h1>{{ title }}</h1>
   <p>Edit</p>
   <form action='/editedpost' method='POST' id='editor'>
@@ -17,7 +17,7 @@
     <br>
     <div id='editor-container'>
     </div>
-    <textarea form='editor' name='text' readonly hidden></textarea>
+    <textarea form='editor' name='text' readonly id='text' hidden>{{ content }}</textarea>
     <textarea form='editor' name='summary' rows='4' cols='16' placeholder='Summary'>{{ summary }}</textarea>
     <br>
     <button onclick='dewit()'>Edit</button>
@@ -28,8 +28,5 @@
     <br>
     <input type='submit' value='Delete'>
   </form>
-  <script src='{{ url_for('static', filename='quillscript.js') }}'>
-    var lne = {{ contents|safe }};
-    recall(lne_);
-  </script>
+  <script src='{{ url_for('static', filename='quillscript.js') }}'></script>
 </body>

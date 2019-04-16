@@ -13,6 +13,4 @@ function dewit() {
   $("textarea[name='text']").html(quill.root.innerHTML);
   form.submit();
 }
-function recall(lne) {
-  quill.setContents(convertHtmlToDelta(lne));
-}
+lne = () => quill.root.innerHTML = document.getElementById('text').value;
