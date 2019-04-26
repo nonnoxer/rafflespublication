@@ -1,6 +1,7 @@
 from flask import *
 import sqlite3 as sql
 import os
+from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -35,12 +36,14 @@ def login():
         password = request.form['password']
         with sql.connect('databases/users.db') as conn:
             cur = conn.cursor()
-            results = cur.execute('SELECT username FROM users WHERE username==? AND password==?;', (username, password)).fetchone()
-        if results == None:
+            results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
+        if results == []:
             return render_template('login.html', error='Invalid credentials')
-        else:
+        elif sha256_crypt.verify(password, results[0][1]):
             session['user'] = username
             return redirect('/admin')
+        else:
+            return render_template('login.html', error='Invalid credentials')
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
@@ -51,130 +54,118 @@ def admin():
 
 @app.route('/createuser', methods=['GET', 'POST'])
 def createuser():
-    return render_template('createuser.html')
+    if 'user' in session:
+        return render_template('createuser.html')
+    else:
+        return render_template('login.html')
 
 @app.route('/createduser', methods=['GET', 'POST'])
 def createduser():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        with sql.connect('databases/users.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('SELECT username FROM users WHERE username==? AND password==?;', (username,password)).fetchone()
-        if results != None:
-            return render_template('error.html', error='User already exists')
-        else:
+    if 'user' in session:
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            password = sha256_crypt.encrypt(password)
             with sql.connect('databases/users.db') as conn:
                 cur = conn.cursor()
-                cur.execute('INSERT INTO users VALUES (?,?);', (username, password))
-                conn.commit()
-            return redirect('/admin')
+                results = cur.execute('SELECT username FROM users WHERE username==? AND password==?;', (username,password)).fetchone()
+            if results != None:
+                return render_template('error.html', error='User already exists')
+            else:
+                with sql.connect('databases/users.db') as conn:
+                    cur = conn.cursor()
+                    cur.execute('INSERT INTO users VALUES (?,?);', (username, password))
+                    conn.commit()
+                return redirect('/admin')
+    else:
+        return render_template('login.html')
 
 @app.route('/users', methods=['GET', 'POST'])
 def users():
-    with sql.connect('databases/users.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT * FROM users;').fetchall()
-    users = ''
-    for i in results:
-        users = users + '<a href="/edituser' + i[0] + '">' + i[0] + '</a><br>'
-    return render_template('users.html', users=Markup(users))
+    if 'user' in session:
+        with sql.connect('databases/users.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM users;').fetchall()
+        users = ''
+        for i in results:
+            users = users + '<a href="/edituser' + i[0] + '">' + i[0] + '</a><br>'
+        return render_template('users.html', users=Markup(users))
+    else:
+        return render_template('login.html')
 
 @app.route('/edituser<username>')
 def edituser(username):
-    with sql.connect('databases/users.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
-    return render_template('user.html', username=results[0])
-
-@app.route('/editedusername', methods=['GET', 'POST'])
-def editedusername():
-    if request.method == 'POST':
-        username = request.form['username']
-        newname = request.form['newname']
-        with sql.connect('databases/users.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
-        with sql.connect('databases/users.db') as conn:
-            cur = conn.cursor()
-            cur.execute('UPDATE users SET username=? WHERE username==?', (newname, username))
-            conn.commit()
-        return redirect('/admin')
-
-@app.route('/editedpassword', methods=['GET', 'POST'])
-def editedpassword():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        newpass = request.form['newpass']
-        with sql.connect('databases/users.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
-        with sql.connect('databases/users.db') as conn:
-            cur = conn.cursor()
-            cur.execute('UPDATE users SET password=? WHERE username==?', (newpass, username))
-            conn.commit()
-        return redirect('/admin')
-
-@app.route('/deleteduser', methods=['GET', 'POST'])
-def deleteduser():
-    if request.method == 'POST':
-        username = request.form['username']
+    if 'user' in session:
         with sql.connect('databases/users.db') as conn:
             cur = conn.cursor()
             results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
-        if results == None:
-            return render_template('error.html', error='User does not exist')
-        with sql.connect('databases/users.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('DELETE FROM users WHERE username==?;', (username,))
-            conn.commit()
-        return redirect('/admin')
+        return render_template('user.html', username=results[0])
+    else:
+        return render_template('login.html')
+
+@app.route('/editedusername', methods=['GET', 'POST'])
+def editedusername():
+    if 'user' in session:
+        if request.method == 'POST':
+            username = request.form['username']
+            newname = request.form['newname']
+            with sql.connect('databases/users.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
+            with sql.connect('databases/users.db') as conn:
+                cur = conn.cursor()
+                cur.execute('UPDATE users SET username=? WHERE username==?', (newname, username))
+                conn.commit()
+            return redirect('/admin')
+    else:
+        return render_template('login.html')
+
+@app.route('/editedpassword', methods=['GET', 'POST'])
+def editedpassword():
+    if 'user' in session:
+        if request.method == 'POST':
+            username = request.form['username']
+            newpass = request.form['newpass']
+            newpass = sha256_crypt.encrypt(newpass)
+            with sql.connect('databases/users.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
+            with sql.connect('databases/users.db') as conn:
+                cur = conn.cursor()
+                cur.execute('UPDATE users SET password=? WHERE username==?', (newpass, username))
+                conn.commit()
+            return redirect('/admin')
+    else:
+        return render_template('login.html')
+
+@app.route('/deleteduser', methods=['GET', 'POST'])
+def deleteduser():
+    if 'user' in session:
+        if request.method == 'POST':
+            username = request.form['username']
+            with sql.connect('databases/users.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
+            if results == None:
+                return render_template('error.html', error='User does not exist')
+            with sql.connect('databases/users.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('DELETE FROM users WHERE username==?;', (username,))
+                conn.commit()
+            return redirect('/admin')
+    else:
+        return render_template('login.html')
 
 @app.route('/createpost', methods=['GET', 'POST'])
 def createpost():
-    return render_template('createpost.html')
+    if 'user' in session:
+        return render_template('createpost.html')
+    else:
+        return render_template('login.html')
 
 @app.route('/createdpost', methods=['GET', 'POST'])
 def createdpost():
-    title = request.form['title']
-    categories = request.form['categories']
-    if categories == '':
-        categories = 'Uncategorised'
-    else:
-        categories = categories.replace(' ,', ',')
-        categories = categories.replace(', ', ',')
-    text = request.form['text']
-    summary = request.form['summary']
-    with sql.connect('databases/posts.db') as conn:
-        cur = conn.cursor()
-        cur.execute('INSERT INTO posts VALUES (?,?,?,?);', (title, categories, text, summary))
-        conn.commit()
-    return redirect('/admin')
-
-@app.route('/posts', methods=['GET', 'POST'])
-def posts():
-    with sql.connect('databases/posts.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT * FROM posts;').fetchall()
-    result = []
-    for i in range(len(results)):
-        result.append(results.pop())
-    content = ''
-    for i in result:
-        content = content + '<a href="/editpost' + i[0] + '">' + i[0] + '</a><br>'
-    return render_template('posts.html', content=Markup(content))
-
-@app.route('/editpost<title>')
-def editpost(title):
-    with sql.connect('databases/posts.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-    return render_template('post.html', title=results[0][0], categories=results[0][1], content=results[0][2], summary=results[0][3])
-
-@app.route('/editedpost', methods=['GET', 'POST'])
-def editedpost():
-    if request.method == 'POST':
+    if 'user' in session:
         title = request.form['title']
         categories = request.form['categories']
         if categories == '':
@@ -186,74 +177,144 @@ def editedpost():
         summary = request.form['summary']
         with sql.connect('databases/posts.db') as conn:
             cur = conn.cursor()
-            results = cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
+            cur.execute('INSERT INTO posts VALUES (?,?,?,?);', (title, categories, text, summary))
             conn.commit()
         return redirect('/admin')
+    else:
+        return render_template('login.html')
+
+@app.route('/posts', methods=['GET', 'POST'])
+def posts():
+    if 'user' in session:
+        with sql.connect('databases/posts.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM posts;').fetchall()
+        result = []
+        for i in range(len(results)):
+            result.append(results.pop())
+        content = ''
+        for i in result:
+            content = content + '<a href="/editpost' + i[0] + '">' + i[0] + '</a><br>'
+        return render_template('posts.html', content=Markup(content))
+    else:
+        return render_template('login.html')
+
+@app.route('/editpost<title>')
+def editpost(title):
+    if 'user' in session:
+        with sql.connect('databases/posts.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+        return render_template('post.html', title=results[0][0], categories=results[0][1], content=results[0][2], summary=results[0][3])
+    else:
+        return render_template('login.html')
+
+@app.route('/editedpost', methods=['GET', 'POST'])
+def editedpost():
+    if 'user' in session:
+        if request.method == 'POST':
+            title = request.form['title']
+            categories = request.form['categories']
+            if categories == '':
+                categories = 'Uncategorised'
+            else:
+                categories = categories.replace(' ,', ',')
+                categories = categories.replace(', ', ',')
+            text = request.form['text']
+            summary = request.form['summary']
+            with sql.connect('databases/posts.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
+                conn.commit()
+            return redirect('/admin')
+    else:
+        return render_template('login.html')
 
 @app.route('/deletedpost', methods=['GET', 'POST'])
 def deletedpost():
-    if request.method == 'POST':
-        title = request.form['title']
-        with sql.connect('databases/posts.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('DELETE FROM posts WHERE title==?;', (title,))
-            conn.commit()
-        return redirect('/admin')
+    if 'user' in session:
+        if request.method == 'POST':
+            title = request.form['title']
+            with sql.connect('databases/posts.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('DELETE FROM posts WHERE title==?;', (title,))
+                conn.commit()
+            return redirect('/admin')
+    else:
+        return render_template('login.html')
 
 @app.route('/createpage', methods=['GET', 'POST'])
 def createpage():
-    return render_template('createpage.html')
+    if 'user' in session:
+        return render_template('createpage.html')
+    else:
+        return render_template('login.html')
 
 @app.route('/createdpage', methods=['GET', 'POST'])
 def createdpage():
-    title = request.form['title']
-    text = request.form['text']
-    with sql.connect('databases/pages.db') as conn:
-        cur = conn.cursor()
-        cur.execute('INSERT INTO pages VALUES (?,?);', (title, text))
-        conn.commit()
-    return redirect('/admin')
-
-@app.route('/pages', methods=['GET', 'POST'])
-def pages():
-    with sql.connect('databases/pages.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT * FROM pages;').fetchall()
-    result = []
-    for i in range(len(results)):
-        result.append(results.pop())
-    content = ''
-    for i in result:
-        content = content + '<a href="/editpage' + i[0] + '">' + i[0] + '</a><br>'
-    return render_template('pages.html', content=Markup(content))
-
-@app.route('/editpage<title>')
-def editpage(title):
-    with sql.connect('databases/pages.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
-    return render_template('page.html', title=results[0][0], content=results[0][1])
-
-@app.route('/editedpage', methods=['GET', 'POST'])
-def editedpage():
-    if request.method == 'POST':
+    if 'user' in session:
         title = request.form['title']
         text = request.form['text']
         with sql.connect('databases/pages.db') as conn:
             cur = conn.cursor()
-            results = cur.execute('UPDATE pages SET text=? WHERE title==?;', (text, title))
+            cur.execute('INSERT INTO pages VALUES (?,?);', (title, text))
             conn.commit()
         return redirect('/admin')
+    else:
+        return render_template('login.html')
+
+@app.route('/pages', methods=['GET', 'POST'])
+def pages():
+    if 'user' in session:
+        with sql.connect('databases/pages.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM pages;').fetchall()
+        result = []
+        for i in range(len(results)):
+            result.append(results.pop())
+        content = ''
+        for i in result:
+            content = content + '<a href="/editpage' + i[0] + '">' + i[0] + '</a><br>'
+        return render_template('pages.html', content=Markup(content))
+    else:
+        return render_template('login.html')
+
+@app.route('/editpage<title>')
+def editpage(title):
+    if 'user' in session:
+        with sql.connect('databases/pages.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
+        return render_template('page.html', title=results[0][0], content=results[0][1])
+    else:
+        return render_template('login.html')
+
+@app.route('/editedpage', methods=['GET', 'POST'])
+def editedpage():
+    if 'user' in session:
+        if request.method == 'POST':
+            title = request.form['title']
+            text = request.form['text']
+            with sql.connect('databases/pages.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('UPDATE pages SET text=? WHERE title==?;', (text, title))
+                conn.commit()
+            return redirect('/admin')
+    else:
+        return render_template('login.html')
 
 @app.route('/deletedpage', methods=['GET', 'POST'])
 def deletedpage():
-    if request.method == 'POST':
-        title = request.form['title']
-        with sql.connect('databases/pages.db') as conn:
-            cur = conn.cursor()
-            results = cur.execute('DELETE FROM pages WHERE title==?;', (title,))
-            conn.commit()
-        return redirect('/admin')
+    if 'user' in session:
+        if request.method == 'POST':
+            title = request.form['title']
+            with sql.connect('databases/pages.db') as conn:
+                cur = conn.cursor()
+                results = cur.execute('DELETE FROM pages WHERE title==?;', (title,))
+                conn.commit()
+            return redirect('/admin')
+    else:
+        return render_template('login.html')
 
 @app.route('/works')
 def works():
