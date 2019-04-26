@@ -316,6 +316,11 @@ def deletedpage():
     else:
         return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/admin')
+
 @app.route('/works')
 def works():
     with sql.connect('databases/posts.db') as conn:
