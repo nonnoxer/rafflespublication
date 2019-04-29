@@ -1,8 +1,12 @@
 var quill = new Quill('#editor-container', {
   modules: {
     toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline']
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }, { 'font': [] }, { 'size' : [ 'small', false, 'large', 'huge' ] }],
+      ['bold', 'italic', 'underline', 'strike', { 'color': [] }, { 'background': [] }],
+      [{ 'script': 'super' }, { 'script': 'sub' }, 'blockquote', 'code-block'],
+      ['link', 'image'],
+      [{ 'align': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }]
     ]
   },
   placeholder: 'Compose an epic...',
