@@ -29,7 +29,7 @@ def root():
         content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
     return render_template('index.html', content=Markup(content))
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -45,21 +45,21 @@ def login():
         else:
             return render_template('login.html', error='Invalid credentials')
 
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/admin')
 def admin():
     if 'user' in session:
         return render_template('admin.html')
     else:
         return render_template('login.html')
 
-@app.route('/createuser', methods=['GET', 'POST'])
+@app.route('/createuser')
 def createuser():
     if 'user' in session:
         return render_template('createuser.html')
     else:
         return render_template('login.html')
 
-@app.route('/createduser', methods=['GET', 'POST'])
+@app.route('/createduser', methods=['POST'])
 def createduser():
     if 'user' in session:
         if request.method == 'POST':
@@ -80,7 +80,7 @@ def createduser():
     else:
         return render_template('login.html')
 
-@app.route('/users', methods=['GET', 'POST'])
+@app.route('/users')
 def users():
     if 'user' in session:
         with sql.connect('databases/users.db') as conn:
@@ -103,7 +103,7 @@ def edituser(username):
     else:
         return render_template('login.html')
 
-@app.route('/editedusername', methods=['GET', 'POST'])
+@app.route('/editedusername', methods=['POST'])
 def editedusername():
     if 'user' in session:
         if request.method == 'POST':
@@ -120,7 +120,7 @@ def editedusername():
     else:
         return render_template('login.html')
 
-@app.route('/editedpassword', methods=['GET', 'POST'])
+@app.route('/editedpassword', methods=['POST'])
 def editedpassword():
     if 'user' in session:
         if request.method == 'POST':
@@ -138,7 +138,7 @@ def editedpassword():
     else:
         return render_template('login.html')
 
-@app.route('/deleteduser', methods=['GET', 'POST'])
+@app.route('/deleteduser', methods=['POST'])
 def deleteduser():
     if 'user' in session:
         if request.method == 'POST':
@@ -156,14 +156,14 @@ def deleteduser():
     else:
         return render_template('login.html')
 
-@app.route('/createpost', methods=['GET', 'POST'])
+@app.route('/createpost')
 def createpost():
     if 'user' in session:
         return render_template('createpost.html')
     else:
         return render_template('login.html')
 
-@app.route('/createdpost', methods=['GET', 'POST'])
+@app.route('/createdpost', methods=['POST'])
 def createdpost():
     if 'user' in session:
         title = request.form['title']
@@ -183,7 +183,7 @@ def createdpost():
     else:
         return render_template('login.html')
 
-@app.route('/posts', methods=['GET', 'POST'])
+@app.route('/posts')
 def posts():
     if 'user' in session:
         with sql.connect('databases/posts.db') as conn:
@@ -209,7 +209,7 @@ def editpost(title):
     else:
         return render_template('login.html')
 
-@app.route('/editedpost', methods=['GET', 'POST'])
+@app.route('/editedpost', methods=['POST'])
 def editedpost():
     if 'user' in session:
         if request.method == 'POST':
@@ -230,7 +230,7 @@ def editedpost():
     else:
         return render_template('login.html')
 
-@app.route('/deletedpost', methods=['GET', 'POST'])
+@app.route('/deletedpost', methods=['POST'])
 def deletedpost():
     if 'user' in session:
         if request.method == 'POST':
@@ -243,14 +243,14 @@ def deletedpost():
     else:
         return render_template('login.html')
 
-@app.route('/createpage', methods=['GET', 'POST'])
+@app.route('/createpage')
 def createpage():
     if 'user' in session:
         return render_template('createpage.html')
     else:
         return render_template('login.html')
 
-@app.route('/createdpage', methods=['GET', 'POST'])
+@app.route('/createdpage', methods=['POST'])
 def createdpage():
     if 'user' in session:
         title = request.form['title']
@@ -263,7 +263,7 @@ def createdpage():
     else:
         return render_template('login.html')
 
-@app.route('/pages', methods=['GET', 'POST'])
+@app.route('/pages')
 def pages():
     if 'user' in session:
         with sql.connect('databases/pages.db') as conn:
@@ -289,7 +289,7 @@ def editpage(title):
     else:
         return render_template('login.html')
 
-@app.route('/editedpage', methods=['GET', 'POST'])
+@app.route('/editedpage', methods=['POST'])
 def editedpage():
     if 'user' in session:
         if request.method == 'POST':
@@ -303,7 +303,7 @@ def editedpage():
     else:
         return render_template('login.html')
 
-@app.route('/deletedpage', methods=['GET', 'POST'])
+@app.route('/deletedpage', methods=['POST'])
 def deletedpage():
     if 'user' in session:
         if request.method == 'POST':
@@ -392,7 +392,7 @@ def test():
                 result.append(j)
     return str(results)
 
-@app.route('/feedback', methods=['GET', 'POST'])
+@app.route('/feedback', methods=['POST'])
 def feedback():
     if request.method == 'POST':
         name = request.form['name']
@@ -406,15 +406,18 @@ def feedback():
 
 @app.route('/feedbacked')
 def feedbacked():
-    with sql.connect('databases/feedback.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT * FROM feedback;').fetchall()
-    feedback = ''
-    for i in results:
-        feedback = feedback + "<tr><form action='deletedfeedback' method='POST' id='feedbacker'><td>" + i[0] + "</td><td>" + i[1] + "</td><td><textarea form='feedbacker' name='feedback' rows='4' readonly>" + i[2] + "</textarea></td><td><input type='submit' value='Delete'></form></tr>"
-    return render_template('feedback.html', feedback=Markup(feedback))
+    if 'user' in session:
+        with sql.connect('databases/feedback.db') as conn:
+            cur = conn.cursor()
+            results = cur.execute('SELECT * FROM feedback;').fetchall()
+        feedback = ''
+        for i in results:
+            feedback = feedback + "<tr><form action='deletedfeedback' method='POST' id='feedbacker'><td>" + i[0] + "</td><td>" + i[1] + "</td><td><textarea form='feedbacker' name='feedback' rows='4' readonly>" + i[2] + "</textarea></td><td><input type='submit' value='Delete'></form></tr>"
+        return render_template('feedback.html', feedback=Markup(feedback))
+    else:
+        return render_template("login.html")
 
-@app.route('/deletedfeedback', methods=['GET', 'POST'])
+@app.route('/deletedfeedback', methods=['POST'])
 def deletedfeedback():
     if request.method == 'POST':
         feedback = request.form['feedback']
