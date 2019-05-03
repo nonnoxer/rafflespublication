@@ -3,17 +3,16 @@
   <head>
     <title>Raffles Publications</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href='{{ url_for('static', filename='favicon.ico') }}' />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
   </head>
   <body>
     <br>
     <div class='container'>
       <div class='row'>
-        <div class='col-2'>
-        </div>
-        <div class='col-6 header'>
-          <h2>RAFFLES PUBLICATIONS</h2>
+        <div class='col-9 header'>
+          <h2><a style="color: inherit;text-decoration: none;" href="/">RAFFLES PUBLICATIONS</a></h2>
           <div class='navbar'>
             <a href='/' class='orange'>Home</a>
             <a href='/About' class='orange'>About</a>
@@ -21,12 +20,10 @@
             <a href='/all' class='orange'>All Pages</a>
           </div>
         </div>
-        <div class='col-2 header right'>
+        <div class='col-3 header right'>
           <h6>THE EAGLE EYE</h6>
-          <a href='https://www.facebook.com/Raffles-Publications-1437480963198257/'><img src=' {{ url_for('static', filename='facebook.png') }}' width=15%></a>
-          <a href='https://www.ri.edu.sg/'><img src=' {{url_for('static', filename='instagram.png') }}' width=15%></a>
-        </div>
-        <div class='col-2'>
+          <a class="rpubs_icon fa fa-facebook" href="https://www.facebook.com/Raffles-Publications-1437480963198257/"></a>
+          <a class="rpubs_icon fa fa-instagram" href="#"></a>
         </div>
       </div>
     </div>
@@ -36,20 +33,20 @@
     <br>
     <div class='container'>
       <div class='row'>
-        <div class='col-2'>
+        <div class='col-1'>
         </div>
-        <div class='col-8 body'>
+        <div class='col-10 body'>
           <h1>{{ title }}</h1>
           <p>{{ content }}</p>
         </div>
-        <div class='col-2'>
+        <div class='col-1'>
         </div>
       </div>
     </div>
     <br>
     <div class='footer centre'>
       <br>
-      <p>Made by Chen Nuode and <a href='https://github.com/nonnoxer'>Natanael Tan</a> from Raffles Institution Infocomm Club 2019</p>
+      <p>Made by <a href='https://github.com/ChenNuode'>Chen Nuode</a> and <a href='https://github.com/nonnoxer'>Natanael Tan</a> from Raffles Institution Infocomm Club 2019</p>
       <p class='centre'><a href='/admin'>Admin login</a></p>
       <br>
     </div>

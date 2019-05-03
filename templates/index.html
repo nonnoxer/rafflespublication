@@ -2,38 +2,15 @@
 <html>
   <head>
     <title>Raffles Publications</title>
-    
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
   </head>
-
-  <style type="text/css">
-    .rpubs_icon {
-      font-size: 1.5em;
-      padding: 5px;
-      color: rgb(170, 132, 67);
-      text-decoration: none;
-    }
-    .rpubs_icon:hover {
-      color: inherit;
-      text-decoration: none;
-    }
-    a:hover {
-      color: inherit;
-      text-decoration: none;
-    }
-  </style>
-
   <body>
     <br>
     <div class='container'>
       <div class='row'>
-
         <div class='col-9 header'>
           <h2><a style="color: inherit;text-decoration: none;" href="/">RAFFLES PUBLICATIONS</a></h2>
           <div class='navbar'>
@@ -43,51 +20,37 @@
             <a href='/all' class='orange'>All Pages</a>
           </div>
         </div>
-
         <div class='col-3 header right'>
           <h6>THE EAGLE EYE</h6>
-
           <a class="rpubs_icon fa fa-facebook" href="https://www.facebook.com/Raffles-Publications-1437480963198257/"></a>
           <a class="rpubs_icon fa fa-instagram" href="#"></a>
-
         </div>
-
       </div>
     </div>
-    
     <div style="margin-bottom: 30px;">
       <img src="{{ url_for('static', filename='banner.jpeg') }}" width=100%>
     </div>
-    
-
     <div class='container'>
       <div class='row'>
         <div class='col-1'></div>
-
         <div class='col-3 sidebar'>
           <div class="row">
           <h4>Hello there!</h4>
           <p>Welcome to the Raffles Publications website! This is where we post our articles as well as make announcements. Hope you enjoy your stay!</p>
-          </div>  
+          </div>
           <div class="row">
-            <div style="margin: 0px;text-align: left;width: 100%;padding: 10px;">  
-           
+            <div style="margin: 0px;text-align: left;width: 100%;padding: 10px;">
               <a class="rpubs_icon fa fa-facebook" href="https://www.facebook.com/Raffles-Publications-1437480963198257/"></a>
               <a class="rpubs_icon fa fa-pinterest" href="#"></a>
               <a class="rpubs_icon fa fa-youtube" href="#"></a>
               <a class="rpubs_icon fa fa-instagram" href="#"></a>
-
             </div>
           </div>
-
-
           <div class="row" style="margin-bottom: 25px;">
             <a href='/categories' class='orange round'>Read by Categories</a>
           </div>
-          
           <div class="row">
             <p>Feel free to drop some suggestions. We always welcome feedback.</p>
-
             <form style="width: 100%;" action='/feedback' method='POST' id='feedback'>
               <input style="width: 100%;margin: 3px;" type='text' name='name' placeholder='Name' class='orange form'>
               <input style="width: 100%;margin: 3px;" type='email' name='email' placeholder='Email' class='orange form'>
@@ -95,9 +58,7 @@
               <br><input style="margin-top: 5px;margin: 3px;" type='submit' name='Submit' class='orange round'>
             </form>
           </div>
-
         </div>
-
         <div class='col-7'>
           <div class='body'>
             <h1>Recent Posts</h1>
@@ -105,13 +66,10 @@
             <a href='/works'>More...</a>
           </div>
         </div>
-
         <div class='col-1'></div>
       </div>
     </div>
-
     <br>
-
     <div class='footer centre'>
       <br>
       <p>Made by <a href='https://github.com/ChenNuode'>Chen Nuode</a> and <a href='https://github.com/nonnoxer'>Natanael Tan</a> from Raffles Institution Infocomm Club 2019</p>
