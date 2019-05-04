@@ -10,7 +10,10 @@
 <body onload='lne()'>
   <h1>{{ title }}</h1>
   <p>Edit</p>
-  <form action='/editedpage' method='POST' id='editor'>
+  <script type="text/javascript">
+    document.getElementById("myform").action = "/editpage/" + encodeURI("{{title}}");
+  </script>
+  <form id="myform" action='#' method='POST' id='editor'>
     <input type='text' name='title' readonly value='{{ title }}'>
     <br>
     <div id='editor-container'>
@@ -19,9 +22,10 @@
     <br>
     <button onclick='dewit()'>Edit</button>
   </form>
+  
   <p>Delete</p>
   <form action='/deletedpage' method='POST'>
-    <input type='text' name='title' readonly value='{{ title }}'>
+    <input type="text" value="{{title}}" name="title" style="display: none;">
     <br>
     <input type='submit' value='Delete'>
   </form>

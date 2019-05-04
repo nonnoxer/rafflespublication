@@ -6,26 +6,25 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
 </head>
 <body>
-  <p>Edit username</p>
-  <form action='/editedusername' method='POST' id='editor'>
-    <input type='text' name='username' readonly value='{{ username }}'>
-    <br>
+  
+<h1>For user - {{username}}</h1>
+<p>Edit username</p>
+<form action='/editedusername' method='POST' id='editor'>
+    <input type="text" value="{{username}}" name="username" style="display: none;">
     <input type='text' name='newname' placeholder='New username'>
     <br>
     <input type='submit' value='Update'>
   </form>
   <p>Edit password</p>
   <form action='/editedpassword' method='POST'>
-    <input type='text' name='username' readonly value='{{ username }}'>
-    <br>
+    <input type="text" value="{{username}}" name="username" style="display: none;">
     <input type='password' name='newpass' placeholder='New password'>
     <br>
     <input type='submit' value='Update'>
   </form>
   <p>Delete user</p>
-  <form action='deleteduser' method='POST'>
-    <input type='text' name='username' readonly value='{{ username }}'>
-    <br>
+  <form action='/deleteduser' method='POST'>
+    <input type="text" value="{{username}}" name="username" style="display: none;">
     <input type='submit' value='Delete'>
   </form>
 </body>
