@@ -447,10 +447,10 @@ def feedbacked():
             results = cur.execute('SELECT * FROM feedback;').fetchall()
         feedback = ''
         for i in results:
-            feedback = feedback + "<tr><form action='deletedfeedback' method='POST' id='feedbacker'><td>" + i[0] + "</td><td>" + i[1] + "</td><td><textarea form='feedbacker' name='feedback' rows='4' readonly>" + i[2] + "</textarea></td><td><input type='submit' value='Delete'></form></tr>"
+            feedback = feedback + '<tr><form action="deletedfeedback" method="POST" id="feedbacker"><td>' + i[0] + '</td><td>' + i[1] + '</td><td><textarea form="feedbacker" name="feedback" rows="4" readonly>' + i[2] + '</textarea></td><td><input type="submit" value="Delete"></form></tr>'
         return render_template('feedback.html', feedback=Markup(feedback))
     else:
-        return render_template("login.html")
+        return render_template('login.html')
 
 @app.route('/deletedfeedback', methods=['POST'])
 def deletedfeedback():
@@ -487,7 +487,7 @@ def serveFile(title):
         results[0][1] = results[0][1].split(',')
         categories = '<p><strong>Categories: </strong>'
         for i in results[0][1]:
-            categories = categories + "<a href='/category" +  i + "'>" + i + '</a>, '
+            categories = categories + '<a href="/category' +  i + '">' + i + '</a>, '
         categories = categories[:len(categories) - 2] + '</p>'
         content = '''<div class='col-10 body'>
           <h1>''' + results[0][0] + '''</h1>

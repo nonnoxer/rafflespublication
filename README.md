@@ -8,10 +8,12 @@ The backend was completed by @nonnoxer and the frontend will be completed by @Ch
 
 ## Brief Structure of Code
 
-* All regularly viewable pages are rendered to the same jinja template ```templates/content.html```
+* All regularly viewable pages are rendered to the same jinja template ```templates/content.html``` *index.html is obsolete*
 * All posts, custom pages, users and feedback are stored in ```databases```
 * The interactiveness in the main admin dashboard is stored in ```static/script.js```
 * The script activating the quill rich text editor is stored in ```static/quillscript.js```
+* Website css stored in ```static/style.css```
+* Admin panel css stored in ```static/admin.css```
 
 ## Stuff Used
 
