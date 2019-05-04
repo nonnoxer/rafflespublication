@@ -27,7 +27,40 @@ def root():
     content = ''
     for i in result:
         content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
-    return render_template('index.html', content=Markup(content))
+    content = '''<div class='col-3 sidebar'>
+                    <div class="row">
+                        <h4>Hello there!</h4>
+                        <p>Welcome to the Raffles Publications website! This is where we post our articles as well as make announcements. Hope you enjoy your stay!</p>
+                    </div>
+                    <div class="row">
+                        <div style="margin: 0px;text-align: left;width: 100%;padding: 10px;">
+                          <a class="rpubs_icon fa fa-facebook" href="https://www.facebook.com/Raffles-Publications-1437480963198257/"></a>
+                          <a class="rpubs_icon fa fa-pinterest" href="#"></a>
+                          <a class="rpubs_icon fa fa-youtube" href="#"></a>
+                          <a class="rpubs_icon fa fa-instagram" href="#"></a>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 25px;">
+                        <a href='/categories' class='orange round'>Read by Categories</a>
+                    </div>
+                    <div class="row">
+                        <p>Feel free to drop some suggestions. We always welcome feedback.</p>
+                        <form style="width: 100%;" action='/feedback' method='POST' id='feedback'>
+                          <input style="width: 100%;margin: 3px;" type='text' name='name' placeholder='Name' class='orange form'>
+                          <input style="width: 100%;margin: 3px;" type='email' name='email' placeholder='Email' class='orange form'>
+                          <textarea style="width: 100%;margin: 3px;" form='feedback' name='feedback' placeholder='Your message' class='orange form' rows='3'></textarea>
+                          <br><input style="margin-top: 5px;margin: 3px;" type='submit' name='Submit' class='orange round'>
+                        </form>
+                    </div>
+                </div>
+                <div class='col-7'>
+                    <div class='body'>
+                        <h1>Recent Posts</h1>''' + \
+                        content + \
+                        '''<a href='/works'>More...</a>
+                    </div>
+                </div>'''
+    return render_template('content.html', content=Markup(content))
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -332,7 +365,11 @@ def works():
     content = ''
     for i in result:
         content = content + '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
-    return render_template('content.html', title='Works', content=Markup(content))
+    content = '''<div class='col-10 body'>
+        <h1>''' + "Works" + '''</h1>
+        <p>''' + content + '''</p>
+    </div>'''
+    return render_template('content.html', content=Markup(content))
 
 @app.route('/categories')
 def categories():
@@ -350,7 +387,11 @@ def categories():
     categories = ''
     for i in result:
         categories = categories + '<a href="/category' + i + '">' + i + '</a><br>'
-    return render_template('content.html', title='Categories', content=Markup(categories))
+    content = '''<div class='col-10 body'>
+        <h1>''' + "Categories" + '''</h1>
+        <p>''' + categories + '''</p>
+    </div>'''
+    return render_template('content.html', content=Markup(content))
 
 @app.route('/category<category>')
 def category(category):
@@ -365,7 +406,11 @@ def category(category):
         for j in i[1]:
             if category in j:
                 content = '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>' + content
-    return render_template('content.html', title=category, content=Markup(content))
+    content = '''<div class='col-10 body'>
+        <h1>''' + category + '''</h1>
+        <p>''' + content + '''</p>
+    </div>'''
+    return render_template('content.html', content=Markup(content))
 
 @app.route('/all')
 def other():
@@ -376,21 +421,11 @@ def other():
     for i in results:
         if i[0] != 'About':
             content = content + '<a href="/' + i[0] + '">' + i[0] + '</a><br>'
-    return render_template('content.html', title='All Pages', content=Markup(content))
-
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-    with sql.connect('databases/posts.db') as conn:
-        cur = conn.cursor()
-        results = cur.execute('SELECT categories FROM posts;').fetchall()
-    result = []
-    for i in results:
-        i = list(i)
-        i[0] = i[0].split(',')
-        for j in i[0]:
-            if j not in result:
-                result.append(j)
-    return str(results)
+    content = '''<div class='col-10 body'>
+        <h1>''' + "All pages" + '''</h1>
+        <p>''' + content + '''</p>
+    </div>'''
+    return render_template('content.html', content=Markup(content))
 
 @app.route('/feedback', methods=['POST'])
 def feedback():
@@ -441,7 +476,11 @@ def serveFile(title):
         else:
             results[0] = list(results[0])
             results[0][1] = results[0][1].replace('\r\n', '<br>')
-            return render_template('content.html', title=results[0][0], content=Markup(results[0][1]))
+            content = '''<div class='col-10 body'>
+              <h1>''' + results[0][0] + '''</h1>
+              <p>''' + results[0][1] + '''</p>
+            </div>'''
+            return render_template('content.html', content=Markup(content))
     else:
         results[0] = list(results[0])
         results[0][2] = results[0][2].replace('\r\n', '<br>')
@@ -450,6 +489,10 @@ def serveFile(title):
         for i in results[0][1]:
             categories = categories + "<a href='/category" +  i + "'>" + i + '</a>, '
         categories = categories[:len(categories) - 2] + '</p>'
-        return render_template('content.html', title=results[0][0], content=Markup(categories + results[0][2]))
+        content = '''<div class='col-10 body'>
+          <h1>''' + results[0][0] + '''</h1>
+          <p>''' + categories + results[0][2] + '''</p>
+        </div>'''
+        return render_template('content.html', content=Markup(content))
 
 app.run(debug=True)
