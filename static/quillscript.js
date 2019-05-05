@@ -9,12 +9,21 @@ var quill = new Quill('#editor-container', {
       [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }]
     ]
   },
-  placeholder: 'Compose an epic...',
+  placeholder: 'Start writing...',
   theme: 'snow'  // or 'bubble'
 });
 function dewit() {
   form = document.getElementById('editor');
-  $("textarea[name='text']").html(quill.root.innerHTML);
+  //$("textarea[name='text']").html(quill.root.innerHTML);
+
+  $("textarea[name='text']").html(JSON.stringify(quill.getContents()));
+
   form.submit();
 }
-lne = () => quill.root.innerHTML = document.getElementById('text').value;
+function lne() {
+  lestring = document.getElementById('text').textContent;
+  var mydelta = JSON.parse(lestring);
+  var deltaOps =  mydelta["ops"];  
+  quill.setContents(deltaOps);
+  //quill.root.innerHTML = document.getElementById('text').value;
+}

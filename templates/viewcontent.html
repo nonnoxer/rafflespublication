@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 
-    <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.quilljs.com/1.3.6/quill.bubble.css">
     <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
-
+    
   </head>
   <body>
     <br>
@@ -32,7 +32,7 @@
       </div>
     </div>
     <div>
-      <img src=' {{ url_for('static', filename='banner.jpeg') }}' width=100%>
+      <img src="{{ url_for('static', filename='banner.jpeg') }}" width=100%>
     </div>
     <br>
     <div class='container'>
@@ -40,8 +40,37 @@
         <div class='col-1'></div>
         <div class="col-10">
           <div class="row">
-            {{ content }}
-          </div>
+            
+
+
+            {{content}}
+            <div id="editor" style="width: 100%;background-color: white;"></div>
+            </div>
+            <p id="datasource" style="display: none;">{{posttext}}</p>
+            
+            <script type="text/javascript">
+          
+              var quill = new Quill('#editor', {
+                theme: 'bubble',
+                "modules": {
+                    "toolbar": false,
+                },
+                readOnly: true,
+              });
+
+              mystring = document.getElementById("datasource").textContent;
+              var mydelta = JSON.parse(mystring);
+              
+              var deltaOps =  mydelta["ops"];  
+              quill.setContents(deltaOps);
+
+              //document.getElementById("editor").innerHTML = `{{posttext}}`
+              
+            </script>
+
+
+
+
         </div>
         <div class='col-1'></div>
       </div>

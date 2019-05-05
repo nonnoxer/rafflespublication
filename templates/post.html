@@ -11,11 +11,7 @@
   <h1>{{ title }}</h1>
   <p>Edit</p>
 
-  <script type="text/javascript">
-    document.getElementById("myform").action = "/editpost/" + encodeURI("{{title}}");
-  </script>
-
-  <form id="myform" action='#' method='POST' id='editor'>
+  <form id='editor' action='/editpost/{{title}}' method='POST'>
     <input type='text' name='title' readonly value='{{ title }}'>
     <br>
     <input type='text' name='categories' value='{{ categories }}' placeholder='Categories'>
@@ -32,5 +28,5 @@
     <input type="text" value="{{title}}" name="title" style="display: none;">
     <input type='submit' value='Delete'>
   </form>
-  <script src='{{ url_for('static', filename='quillscript.js') }}'></script>
+  <script src="{{ url_for('static', filename='quillscript.js') }}"></script>
 </body>

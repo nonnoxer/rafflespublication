@@ -23,13 +23,18 @@ body {
 }
 .body {
   background-color: white;
+  padding: 15px;
 }
 .sidebar {
   color: white;
+  background-color: #014e44;
 }
 .footer {
   color: white;
   background-color: #013333;
+}
+.mydiv {
+  padding: 15px;
 }
 
 .centre {

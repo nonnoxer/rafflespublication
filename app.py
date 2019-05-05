@@ -16,7 +16,7 @@ with sql.connect('databases/feedback.db') as conn:
 	conn.execute('CREATE TABLE IF NOT EXISTS feedback(name, email, feedback);')
 
 
-errorstring = "<div style='background-color:white;width:100%;padding:10px;'>404: File does not exist</div>"
+errorstring = "<div class='body' style='width:100%;'><b>404: File does not exist</b></div>"
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -24,12 +24,12 @@ def root():
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts;').fetchall()
 	result = []
-	for i in range(3):
+	for i in range(5):
 		if len(results) > 0:
 			result.append(results.pop())
 	content = ''
 	for i in result:
-		content = content + '<a href="/post/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
+		content = content + '<div style="margin: 15px 0px 15px 0px;"><a href="/post/' + i[0] + '"><h3>' + i[0] + '</h3></a><p>' + i[3] + '</p></div>'
 	content = '''<div class='col-3 sidebar'>
 					<div class="row">
 						<h4>Hello there!</h4>
@@ -48,20 +48,18 @@ def root():
 					</div>
 					<div class="row">
 						<p>Feel free to drop some suggestions. We always welcome feedback.</p>
-						<form style="width: 100%;" action='/feedback' method='POST' id='feedback'>
-						  <input style="width: 100%;margin: 5px;margin-top:15px;" type='text' name='name' placeholder='Name' class='orange form'>
-						  <input style="width: 100%;margin: 5px;" type='email' name='email' placeholder='Email' class='orange form'>
-						  <textarea style="width: 100%;margin: 5px;" form='feedback' name='feedback' placeholder='Your message' class='orange form' rows='3'></textarea>
+						<form style="width: 90%;" action='/feedback' method='POST' id='feedback'>
+						  <input style="width: 100%;margin: 5px 0px;" type='text' name='name' placeholder='Name' class='orange form'>
+						  <input style="width: 100%;margin: 5px 0px;" type='email' name='email' placeholder='Email' class='orange form'>
+						  <textarea style="width: 100%;margin: 5px 0px;" form='feedback' name='feedback' placeholder='Your message' class='orange form' rows='3'></textarea>
 						  <input style="margin: 5px;margin-top:0px;" type='submit' name='Submit' class='orange round'>
 						</form>
 					</div>
 				</div>
-				<div class='col-7'>
-					<div class='body'>
+				<div class='col-9 body'>
 						<h1>Recent Posts</h1>''' + \
 						content + \
-						'''<a href='/works'>More...</a>
-					</div>
+						'''<a href='/works'>More >></a>
 				</div>'''
 	return render_template('content.html', content=Markup(content))
 
@@ -362,8 +360,8 @@ def works():
 	
 	content = ''
 	for i in results:
-		content = content + '<a href="/post/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>'
-	content = '''<div class='col-10 body'>
+		content = content + '<div style="margin: 15px 0px 15px 0px;"><a href="/post/' + i[0] + '"><h3>' + i[0] + '</h3></a><p>' + i[3] + '</p></div>'
+	content = '''<div class='col-12 body'>
 		<h1>''' + "Works" + '''</h1>
 		<p>''' + content + '''</p>
 	</div>'''
@@ -382,10 +380,10 @@ def categories():
 			result.add(j)
 	categories = ''
 	for i in result:
-		categories = categories + '<a href="/category/' + i + '">' + i + '</a><br>'
-	content = '''<div class='col-10 body'>
+		categories = categories + '<a href="/category/' + i + '"><h4>' + i + '</h4></a>'
+	content = '''<div class='col-12 body'>
 		<h1>''' + "Categories" + '''</h1>
-		<p>''' + categories + '''</p>
+		''' + categories + '''
 	</div>'''
 	return render_template('content.html', content=Markup(content))
 
@@ -400,28 +398,28 @@ def category(category):
 		listofcategs = i[1].split(',')
 		for j in listofcategs:
 			if category in j:
-				content = '<a href="/' + i[0] + '"><h2>' + i[0] + '</h2></a><p>' + i[3] + '</p><br>' + content
-	content = '''<div class='col-10 body'>
+				content = content + '<div style="margin: 15px 0px 15px 0px;"><a href="/post/' + i[0] + '"><h3>' + i[0] + '</h3></a><p>' + i[3] + '</p></div>'
+	content = '''<div class='col-12 body'>
 		<h1>''' + category + '''</h1>
-		<p>''' + content + '''</p>
+		''' + content + '''
 	</div>'''
 	return render_template('content.html', content=Markup(content))
 
 @app.route('/all')
 def other():
 	content = '''
-		<a href="/">Home</a><br>
-		<a href="/About">About</a><br>
-		<a href="/works">Works</a><br>
-		<a href="/categories">Categories</a><br>'''
+		<a href="/"><h4>Home</h4></a>
+		<a href="/About"><h4>About</h4></a>
+		<a href="/works"><h4>Works</h4></a>
+		<a href="/categories"><h4>Categories</h4></a>'''
 
 	with sql.connect('databases/pages.db') as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM pages').fetchall()
 	for i in results:
 		if i[0] != 'About':
-			content = content + '<a href="/' + i[0] + '">' + i[0] + '</a><br>'
-	content = '''<div class='col-10 body'>
+			content = content + '<a href="/' + i[0] + '"><h4>' + i[0] + '</h4></a>'
+	content = '''<div class='col-12 body'>
 		<h1>''' + "All pages" + '''</h1>
 		<p>''' + content + '''</p>
 	</div>'''
@@ -472,11 +470,9 @@ def serveFile(title):
 	else:
 		results[0] = list(results[0])
 		results[0][1] = results[0][1].replace('\r\n', '<br>')
-		content = '''<div class='col-10 body'>
-		  <h1>''' + results[0][0] + '''</h1>
-		  <p>''' + results[0][1] + '''</p>
-		</div>'''
-		return render_template('content.html', content=Markup(content))
+		content = '''<div class='col-12 body'>
+		  <h1>''' + results[0][0] + '''</h1></div>'''
+		return render_template('viewcontent.html', content=Markup(content), posttext = Markup(results[0][1]))
 
 
 @app.route('/post/<title>')
@@ -494,10 +490,9 @@ def servePost(title):
 		for i in results[0][1]:
 			categories = categories + '<a href="/category' +  i + '">' + i + '</a>, '
 		categories = categories[:len(categories) - 2] + '</p>'
-		content = '''<div class='col-10 body'>
-		  <h1>''' + results[0][0] + '''</h1>
-		  <p>''' + categories + results[0][2] + '''</p>
-		</div>'''
-		return render_template('content.html', content=Markup(content))
+		
+		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1>" + results[0][0] + "</h1><p>" + categories + "</p></div>"
+		
+		return render_template('viewcontent.html', content=Markup(content), posttext = Markup(results[0][2]))
 
 app.run(debug=True)
