@@ -21,3 +21,5 @@ The backend was completed by @nonnoxer and the frontend will be completed by @Ch
 * Sqlite
 * [Quill](https://quilljs.com)
 * Jquery
+
+Welcome to a semi-functional Flask app. This is your first post. Edit or delete it, then start writing!
