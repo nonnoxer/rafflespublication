@@ -10,12 +10,10 @@ var quill = new Quill('#editor-container', {
     ]
   },
   placeholder: 'Start writing...',
-  theme: 'snow'  // or 'bubble'
+  theme: 'snow'
 });
 function dewit() {
   form = document.getElementById('editor');
-  //$("textarea[name='text']").html(quill.root.innerHTML);
-
   $("textarea[name='text']").html(JSON.stringify(quill.getContents()));
 
   form.submit();
@@ -23,7 +21,6 @@ function dewit() {
 function lne() {
   lestring = document.getElementById('text').textContent;
   var mydelta = JSON.parse(lestring);
-  var deltaOps =  mydelta["ops"];  
+  var deltaOps =  mydelta["ops"];
   quill.setContents(deltaOps);
-  //quill.root.innerHTML = document.getElementById('text').value;
 }
