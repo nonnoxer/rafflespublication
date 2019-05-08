@@ -9,13 +9,11 @@
 </head>
 <body>
   <h1>New post</h1>
-  <form action='/createpost' method='POST' id='editor'>
+  <form action='/createpost' method='POST' id='editor' enctype="multipart/form-data">
     <input type='text' name='title' placeholder='Title'>
     <br>
-    <input type='text' name='categories' placeholder='Categories'>#Separated with commas
-    <br>
-    <p>File icon: <input type="file" name='icon' accept='image/*'></p>
-    <br>
+    <p><input type='text' name='categories' placeholder='Categories'> (Separated with commas)</p>
+    <p>File icon: <input type="file" name='icon' accept='image/*'> (Ideal size 128x128)</p>
     <div id='editor-container'>
     </div>
     <textarea form='editor' name='text' readonly hidden></textarea>

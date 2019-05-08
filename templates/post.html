@@ -11,13 +11,12 @@
   <h1>{{ title }}</h1>
   <p>Edit</p>
 
-  <form id='editor' action='/editpost/{{title}}' method='POST'>
+  <form id='editor' action='/editpost/{{title}}' method='POST' enctype="multipart/form-data">
     <input type='text' name='title' readonly value='{{ title }}'>
     <br>
-    <input type='text' name='categories' value='{{ categories }}' placeholder='Categories'>
-    <br>
-    <p>File icon: <input type='file' name='icon' accept='image/*'></p>
-    {{ icon }}
+    <p><input type='text' name='categories' value='{{ categories }}' placeholder='Categories'> (Separated with commas)</p>
+    <p>File icon: <input type='file' name='icon' accept='image/*'> (Ideal size 128x128)</p>
+    <img src="/static/{{ icon }}" width='128px'>
     <div id='editor-container'>
     </div>
     <textarea form='editor' name='text' readonly id='text' hidden>{{ content }}</textarea>

@@ -2,6 +2,7 @@ from flask import *
 import sqlite3 as sql
 import os
 from passlib.hash import sha256_crypt
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -197,10 +198,19 @@ def createpost():
 				categories = categories.replace(', ', ',')
 			text = request.form['text']
 			summary = request.form['summary']
-			icon = request.form['icon']
+			f = open('databases/config.txt', 'r')
+			f = f.readlines()
+			fname = f[0].strip()
+			fname = str(fname)
+			icon = request.files['icon']
+			filename = fname + icon.filename[icon.filename.find('.'):]
+			icon.save('static/' +  secure_filename(filename))
+			f = open('databases/config.txt', 'w')
+			f.write(str(int(fname) + 1))
+			f.close()
 			with sql.connect('databases/posts.db') as conn:
 				cur = conn.cursor()
-				cur.execute('INSERT INTO posts VALUES (?,?,?,?,?);', (title, categories, text, summary, icon))
+				cur.execute('INSERT INTO posts VALUES (?,?,?,?,?);', (title, categories, text, summary, filename))
 				conn.commit()
 			return redirect('/admin')
 	else:
@@ -247,9 +257,19 @@ def editpost(title):
 
 			text = request.form['text']
 			summary = request.form['summary']
+			f = open('databases/config.txt', 'r')
+			f = f.readlines()
+			fname = f[0].strip()
+			fname = str(fname)
+			icon = request.files['icon']
+			filename = fname + icon.filename[icon.filename.find('.'):]
+			icon.save('static/' +  secure_filename(filename))
+			f = open('databases/config.txt', 'w')
+			f.write(str(int(fname) + 1))
+			f.close()
 			with sql.connect('databases/posts.db') as conn:
 				cur = conn.cursor()
-				results = cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
+				results = cur.execute('UPDATE posts SET text=?, categories=?, summary=?, icon=? WHERE title==?;', (text, categories, summary, filename, title))
 				conn.commit()
 			return redirect('/admin')
 
