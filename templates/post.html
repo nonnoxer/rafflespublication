@@ -16,7 +16,7 @@
     <br>
     <p><input type='text' name='categories' value='{{ categories }}' placeholder='Categories'> (Separated with commas)</p>
     <p>File icon: <input type='file' name='icon' accept='image/*'> (Ideal size 128x128)</p>
-    <img src="/static/{{ icon }}" width='128px'>
+    <img src="/static/files/{{ icon }}" class='icon'>
     <div id='editor-container'>
     </div>
     <textarea form='editor' name='text' readonly id='text' hidden>{{ content }}</textarea>

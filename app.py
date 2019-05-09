@@ -30,7 +30,19 @@ def root():
 			result.append(results.pop())
 	content = ''
 	for i in result:
-		content = content + '<div style="margin: 15px 0px 15px 0px;"><a href="/post/' + i[0] + '"><h3>' + i[0] + '</h3></a><p>' + i[3] + '</p></div>'
+		content = content + '''<div class="container">
+			<div class="row">
+				<div class="col-3" style="text-align: center;">
+					<img src="/static/files/''' + i[4] + '''" class="icon">
+				</div>
+				<div style="margin: 15px 0px 15px 0px;" class="col-9">
+					<a href="/post/' + i[0] + '">
+						<h3>''' + i[0] + '''</h3>
+					</a>
+					<p>''' + i[3] + '''</p>
+				</div>
+			</div>
+		</div>'''
 	content = '''<div class='col-3 sidebar'>
 		<div class="row">
 			<h4>Hello there!</h4>
@@ -198,16 +210,19 @@ def createpost():
 				categories = categories.replace(', ', ',')
 			text = request.form['text']
 			summary = request.form['summary']
-			f = open('databases/config.txt', 'r')
-			f = f.readlines()
-			fname = f[0].strip()
-			fname = str(fname)
-			icon = request.files['icon']
-			filename = fname + icon.filename[icon.filename.find('.'):]
-			icon.save('static/' +  secure_filename(filename))
-			f = open('databases/config.txt', 'w')
-			f.write(str(int(fname) + 1))
-			f.close()
+			if str(request.files['icon']) == "<FileStorage: '' ('application/octet-stream')>":
+				filename = 'default.png'
+			else:
+				f = open('databases/config.txt', 'r')
+				f = f.readlines()
+				fname = f[0].strip()
+				fname = str(fname)
+				icon = request.files['icon']
+				filename = fname + icon.filename[icon.filename.find('.'):]
+				icon.save('static/' +  secure_filename(filename))
+				f = open('databases/config.txt', 'w')
+				f.write(str(int(fname) + 1))
+				f.close()
 			with sql.connect('databases/posts.db') as conn:
 				cur = conn.cursor()
 				cur.execute('INSERT INTO posts VALUES (?,?,?,?,?);', (title, categories, text, summary, filename))
@@ -261,16 +276,23 @@ def editpost(title):
 			f = f.readlines()
 			fname = f[0].strip()
 			fname = str(fname)
-			icon = request.files['icon']
-			filename = fname + icon.filename[icon.filename.find('.'):]
-			icon.save('static/' +  secure_filename(filename))
-			f = open('databases/config.txt', 'w')
-			f.write(str(int(fname) + 1))
-			f.close()
-			with sql.connect('databases/posts.db') as conn:
-				cur = conn.cursor()
-				results = cur.execute('UPDATE posts SET text=?, categories=?, summary=?, icon=? WHERE title==?;', (text, categories, summary, filename, title))
-				conn.commit()
+			print(str(request.files['icon']))
+			if str(request.files['icon']) == "<FileStorage: '' ('application/octet-stream')>":
+				with sql.connect('databases/posts.db') as conn:
+					cur = conn.cursor()
+					cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
+					conn.commit()
+			else:
+				icon = request.files['icon']
+				filename = fname + icon.filename[icon.filename.find('.'):]
+				icon.save('static/files/' +  secure_filename(filename))
+				f = open('databases/config.txt', 'w')
+				f.write(str(int(fname) + 1))
+				f.close()
+				with sql.connect('databases/posts.db') as conn:
+					cur = conn.cursor()
+					cur.execute('UPDATE posts SET text=?, categories=?, summary=?, icon=? WHERE title==?;', (text, categories, summary, filename, title))
+					conn.commit()
 			return redirect('/admin')
 
 	else:
@@ -381,7 +403,19 @@ def works():
 
 	content = ''
 	for i in results:
-		content = content + '<div style="margin: 15px 0px 15px 0px;"><a href="/post/' + i[0] + '"><h3>' + i[0] + '</h3></a><p>' + i[3] + '</p></div>'
+		content ='''<div class="container">
+			<div class="row">
+				<div class="col-2" style="text-align: center;">
+					<img src="/static/files/''' + i[4] + '''" class="icon">
+				</div>
+				<div style="margin: 15px 0px 15px 0px;" class="col-10">
+					<a href="/post/' + i[0] + '">
+						<h3>''' + i[0] + '''</h3>
+					</a>
+					<p>''' + i[3] + '''</p>
+				</div>
+			</div>
+		</div>''' + content
 	content = '''<div class='col-12 body'>
 		<h1>''' + "Works" + '''</h1>
 		<p>''' + content + '''</p>
@@ -419,7 +453,19 @@ def category(category):
 		listofcategs = i[1].split(',')
 		for j in listofcategs:
 			if category in j:
-				content = content + '<div style="margin: 15px 0px 15px 0px;"><a href="/post/' + i[0] + '"><h3>' + i[0] + '</h3></a><p>' + i[3] + '</p></div>'
+				content = '''<div class="container">
+					<div class="row">
+						<div class="col-2" style="text-align: center;">
+							<img src="/static/files/''' + i[4] + '''" class="icon">
+						</div>
+						<div style="margin: 15px 0px 15px 0px;" class="col-10">
+							<a href="/post/' + i[0] + '">
+								<h3>''' + i[0] + '''</h3>
+							</a>
+							<p>''' + i[3] + '''</p>
+						</div>
+					</div>
+				</div>''' + content
 	content = '''<div class='col-12 body'>
 		<h1>''' + category + '''</h1>
 		''' + content + '''
