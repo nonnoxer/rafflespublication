@@ -285,10 +285,15 @@ def editpost(title):
 			else:
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
-				icon.save('static/files/' +  secure_filename(filename))
+				icon.save(os.path.join('static', 'files', secure_filename(filename)))
 				f = open('databases/config.txt', 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
+				with sql.connect('databases/posts.db') as conn:
+					cur = conn.cursor()
+					results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
+				if results[0] != 'default.png':
+					os.remove(os.path.join('static', 'files', results[0]))
 				with sql.connect('databases/posts.db') as conn:
 					cur = conn.cursor()
 					cur.execute('UPDATE posts SET text=?, categories=?, summary=?, icon=? WHERE title==?;', (text, categories, summary, filename, title))
@@ -529,10 +534,8 @@ def deletedfeedback():
 
 @app.route('/test')
 def test():
-	with sql.connect('databases/posts.db') as conn:
-		cur = conn.cursor()
-		results = cur.execute('SELECT icon FROM posts;').fetchall()
-	return str(results)
+	os.remove(os.path.join('static', 'files', '1.jpg'))
+	return 'yes'
 
 @app.route('/<title>')
 def serveFile(title):
