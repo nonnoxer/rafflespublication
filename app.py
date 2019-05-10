@@ -36,7 +36,7 @@ def root():
 					<img src="/static/files/''' + i[4] + '''" class="icon">
 				</div>
 				<div style="margin: 15px 0px 15px 0px;" class="col-9">
-					<a href="/post/' + i[0] + '">
+					<a href="/post/''' + i[0] + '''">
 						<h3>''' + i[0] + '''</h3>
 					</a>
 					<p>''' + i[3] + '''</p>
@@ -568,7 +568,7 @@ def servePost(title):
 			categories = categories + '<a href="/category' +  i + '">' + i + '</a>, '
 		categories = categories[:len(categories) - 2] + '</p>'
 
-		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1>" + results[0][0] + "</h1><p>" + categories + "</p></div>"
+		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + results[0][0] + "</h1><p>" + categories + "</p></div>"
 
 		return render_template('viewcontent.html', content=Markup(content), posttext = Markup(results[0][2]))
 

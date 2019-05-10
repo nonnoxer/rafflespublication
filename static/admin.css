@@ -36,3 +36,6 @@ table, th, td {
   max-width: 128px;
   max-height: 128px;
 }
+.preview {
+  background-color: #014e44;
+}
