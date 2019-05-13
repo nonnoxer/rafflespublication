@@ -10,7 +10,6 @@
 <body onload='lne()'>
   <h1>{{ title }}</h1>
   <p>Edit</p>
-
   <form id='editor' action='/editpost/{{title}}' method='POST' enctype="multipart/form-data">
     <input type='text' name='title' readonly value='{{ title }}'>
     <br>
@@ -24,10 +23,26 @@
     <br>
     <button onclick='dewit()'>Edit</button>
   </form>
+  <button onclick='ean()'>Preview</button>
   <p>Delete</p>
   <form action='/deletedpost' method='POST'>
     <input type="text" value="{{title}}" name="title" style="display: none;">
     <input type='submit' value='Delete'>
   </form>
+  <h3>Preview</h3>
+  <div style='background-color: #014e44;'>
+    <br>
+    <div class='row'>
+      <div class='col-1'>
+        <br>
+      </div>
+      <div class='col-10' id='preview' style='background-color: white;'>
+      </div>
+      <div class='col-1'>
+        <br>
+      </div>
+    </div>
+    <br>
+  </div>
   <script src="{{ url_for('static', filename='quillscript.js') }}"></script>
 </body>

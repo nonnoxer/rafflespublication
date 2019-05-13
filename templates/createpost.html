@@ -21,14 +21,20 @@
     <br>
     <button onclick='dewit()'>Create</button>
   </form>
-  <h1>Live Preview</h1>
-  <div class='row preview'>
+  <button onclick='ean()'>Preview</button>
+  <h3>Preview</h3>
+  <div style='background-color: #014e44;'>
     <br>
-    <div class='col-1'></div>
-    <div class='col-10 body' id='preview'>
-      <p>yeetus</p>
+    <div class='row'>
+      <div class='col-1'>
+        <br>
+      </div>
+      <div class='col-10' id='preview' style='background-color: white;'>
+      </div>
+      <div class='col-1'>
+        <br>
+      </div>
     </div>
-    <div class='col-1'></div>
     <br>
   </div>
   <script src="{{ url_for('static', filename='quillscript.js') }}"></script>

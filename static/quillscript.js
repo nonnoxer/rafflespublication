@@ -15,7 +15,6 @@ var quill = new Quill('#editor-container', {
 function dewit() {
   form = document.getElementById('editor');
   $("textarea[name='text']").html(JSON.stringify(quill.getContents()));
-
   form.submit();
 }
 function lne() {
@@ -23,4 +22,7 @@ function lne() {
   var mydelta = JSON.parse(lestring);
   var deltaOps =  mydelta["ops"];
   quill.setContents(deltaOps);
+}
+function ean() {
+  $("#preview").html(JSON.stringify(quill.getContents()));
 }
