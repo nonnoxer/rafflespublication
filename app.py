@@ -3,6 +3,7 @@ import sqlite3 as sql
 import os
 from passlib.hash import sha256_crypt
 from werkzeug.utils import secure_filename
+import re
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -532,10 +533,43 @@ def deletedfeedback():
 			conn.commit()
 		return redirect('/admin')
 
-@app.route('/test')
-def test():
-	os.remove(os.path.join('static', 'files', '1.jpg'))
-	return 'yes'
+@app.route('/search', methods=['POST'])
+def search():
+	if request.method == 'POST':
+		search = request.form['search']
+		with sql.connect('databases/posts.db') as conn:
+			cur = conn.cursor()
+			result = cur.execute('SELECT title FROM posts').fetchall()
+		results = []
+		content = ''
+		for i in result:
+			if re.search(search.lower(), i[0].lower()):
+				results.append(i[0])
+		if results == []:
+			results = "Nothing here, sorry!"
+		else:
+			for i in results:
+				with sql.connect('databases/posts.db') as conn:
+					cur = conn.cursor()
+					result = cur.execute('SELECT * FROM posts WHERE title==?;', (i,)).fetchall()
+				content ='''<div class="container">
+					<div class="row">
+						<div class="col-2" style="text-align: center;">
+							<img src="/static/files/''' + i[4] + '''" class="icon">
+						</div>
+						<div style="margin: 15px 0px 15px 0px;" class="col-10">
+							<a href="/post/' + i[0] + '">
+								<h3>''' + i[0] + '''</h3>
+							</a>
+							<p>''' + i[3] + '''</p>
+						</div>
+					</div>
+				</div>''' + content
+		content = '''<div class='col-12 body'>
+			<h1>''' + "Search" + '''</h1>
+			<p>''' + str(results) + '''</p>
+		</div>'''
+		return render_template('content.html', content=Markup(content))
 
 @app.route('/<title>')
 def serveFile(title):
