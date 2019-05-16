@@ -415,7 +415,7 @@ def works():
 					<img src="/static/files/''' + i[4] + '''" class="icon">
 				</div>
 				<div style="margin: 15px 0px 15px 0px;" class="col-10">
-					<a href="/post/' + i[0] + '">
+					<a href="/post/''' + i[0] + '''">
 						<h3>''' + i[0] + '''</h3>
 					</a>
 					<p>''' + i[3] + '''</p>
@@ -465,7 +465,7 @@ def category(category):
 							<img src="/static/files/''' + i[4] + '''" class="icon">
 						</div>
 						<div style="margin: 15px 0px 15px 0px;" class="col-10">
-							<a href="/post/' + i[0] + '">
+							<a href="/post/''' + i[0] + '''">
 								<h3>''' + i[0] + '''</h3>
 							</a>
 							<p>''' + i[3] + '''</p>
@@ -539,35 +539,58 @@ def search():
 		search = request.form['search']
 		with sql.connect('databases/posts.db') as conn:
 			cur = conn.cursor()
-			result = cur.execute('SELECT title FROM posts').fetchall()
+			result = cur.execute('SELECT title, categories FROM posts').fetchall()
 		results = []
+		categore = []
 		content = ''
+		cattent = ''
 		for i in result:
-			if re.search(search.lower(), i[0].lower()):
-				results.append(i[0])
-		if results == []:
-			results = "Nothing here, sorry!"
+			try:
+				if re.search(search.lower(), i[0].lower()):
+					results.append(i[0])
+				if re.search(search.lower(), i[1].lower()) and i[1] not in categore:
+					categore.append(i[1])
+			except:
+				pass
+		if results == [] and categore == []:
+			content = "Nothing here, sorry!"
+			cattent = "Nothing here, sorry!"
 		else:
-			for i in results:
-				with sql.connect('databases/posts.db') as conn:
-					cur = conn.cursor()
-					result = cur.execute('SELECT * FROM posts WHERE title==?;', (i,)).fetchall()
-				content ='''<div class="container">
-					<div class="row">
-						<div class="col-2" style="text-align: center;">
-							<img src="/static/files/''' + i[4] + '''" class="icon">
+			if results !=[]:
+				for i in results:
+					with sql.connect('databases/posts.db') as conn:
+						cur = conn.cursor()
+						result = cur.execute('SELECT * FROM posts WHERE title==?;', (i,)).fetchall()
+					content ='''<div class="container">
+						<div class="row">
+							<div class="col-2" style="text-align: center;">
+								<img src="/static/files/''' + result[0][4] + '''" class="icon">
+							</div>
+							<div style="margin: 15px 0px 15px 0px;" class="col-10">
+								<a href="/post/''' + result[0][0] + '''">
+									<h3>''' + result[0][0] + '''</h3>
+								</a>
+								<p>''' + result[0][3] + '''</p>
+							</div>
 						</div>
-						<div style="margin: 15px 0px 15px 0px;" class="col-10">
-							<a href="/post/' + i[0] + '">
-								<h3>''' + i[0] + '''</h3>
-							</a>
-							<p>''' + i[3] + '''</p>
-						</div>
-					</div>
-				</div>''' + content
+					</div>''' + content
+			else:
+				content = "Nothing here, sorry!"
+			if categore != []:
+				for i in categore:
+					cattent = '<a href="/category/' + i + '">' + i + '</a>' + cattent
+			else:
+				cattent = 'Nothing here, sorry!'
 		content = '''<div class='col-12 body'>
 			<h1>''' + "Search" + '''</h1>
-			<p>''' + str(results) + '''</p>
+			<form action='/search' method='POST'>
+				<input type='text' name='search' placeholder='Search...' value="''' + search + '''">
+				<button type='submit' style='background: None; border: None;'><i class="fa fa-search"></i></button>
+			</form>
+			<h3>Posts</h3>
+			<p>''' + content + '''</p>
+			<h3>Categories</h3>
+			<p>''' + cattent + '''</p>
 		</div>'''
 		return render_template('content.html', content=Markup(content))
 
@@ -599,7 +622,7 @@ def servePost(title):
 		results[0][1] = results[0][1].split(',')
 		categories = '<p><strong>Categories: </strong>'
 		for i in results[0][1]:
-			categories = categories + '<a href="/category' +  i + '">' + i + '</a>, '
+			categories = categories + '<a href="/category/' +  i + '">' + i + '</a>, '
 		categories = categories[:len(categories) - 2] + '</p>'
 
 		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + results[0][0] + "</h1><p>" + categories + "</p></div>"
