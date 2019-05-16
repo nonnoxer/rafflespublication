@@ -5,11 +5,11 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}" />
 
     <link rel="stylesheet" href="//cdn.quilljs.com/1.3.6/quill.bubble.css">
     <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
-    
+
   </head>
   <body>
     <br>
@@ -40,16 +40,16 @@
         <div class='col-1'></div>
         <div class="col-10">
           <div class="row">
-            
+
 
 
             {{content}}
             <div id="editor" style="width: 100%;background-color: white;"></div>
             </div>
             <p id="datasource" style="display: none;">{{posttext}}</p>
-            
+
             <script type="text/javascript">
-          
+
               var quill = new Quill('#editor', {
                 theme: 'bubble',
                 "modules": {
@@ -60,12 +60,12 @@
 
               mystring = document.getElementById("datasource").textContent;
               var mydelta = JSON.parse(mystring);
-              
-              var deltaOps =  mydelta["ops"];  
+
+              var deltaOps =  mydelta["ops"];
               quill.setContents(deltaOps);
 
               //document.getElementById("editor").innerHTML = `{{posttext}}`
-              
+
             </script>
 
 

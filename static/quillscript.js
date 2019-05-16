@@ -12,6 +12,15 @@ var quill = new Quill('#editor-container', {
   placeholder: 'Start writing...',
   theme: 'snow'
 });
+
+var previewer =  new Quill('#preview', {
+  theme: 'snow',
+  modules: {
+      toolbar: false,
+  },
+  readOnly: true,
+});
+
 function dewit() {
   form = document.getElementById('editor');
   $("textarea[name='text']").html(JSON.stringify(quill.getContents()));
@@ -24,5 +33,7 @@ function lne() {
   quill.setContents(deltaOps);
 }
 function ean() {
-  $("#preview").html(JSON.stringify(quill.getContents()));
+  $('#titlep').html($('#title').innerhtml);
+  $('#catep').html($('#catep').innerhtml);
+  previewer.setContents(quill.getContents());
 }
