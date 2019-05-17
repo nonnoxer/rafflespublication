@@ -625,8 +625,23 @@ def servePost(title):
 			categories = categories + '<a href="/category/' +  i + '">' + i + '</a>, '
 		categories = categories[:len(categories) - 2] + '</p>'
 
-		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + results[0][0] + "</h1><p>" + categories + "</p></div>"
-
-		return render_template('viewcontent.html', content=Markup(content), posttext = Markup(results[0][2]))
+		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + results[0][0] + "</h1><p>" + categories + '''</p></div>
+		<div id="editor" style="width: 100%;background-color: white;"></div>
+		</div>
+		<p id="datasource" style="display: none;">''' + results[0][2] + '''</p>
+		<script type="text/javascript">
+			var quill = new Quill('#editor', {
+			theme: 'bubble',
+			"modules": {
+				"toolbar": false,
+			},
+			readOnly: true,
+			});
+			mystring = document.getElementById("datasource").textContent;
+			var mydelta = JSON.parse(mystring);
+			var deltaOps =  mydelta["ops"];
+			quill.setContents(deltaOps);
+		</script>'''
+		return render_template('content.html', content=Markup(content))
 
 app.run(debug=True)

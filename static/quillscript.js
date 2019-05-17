@@ -33,7 +33,5 @@ function lne() {
   quill.setContents(deltaOps);
 }
 function ean() {
-  $('#titlep').html($('#title').innerhtml);
-  $('#catep').html($('#catep').innerhtml);
   previewer.setContents(quill.getContents());
 }

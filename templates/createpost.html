@@ -7,7 +7,7 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
 </head>
-<body>
+<body oninput='ean()'>
   <h1>New post</h1>
   <form action='/createpost' method='POST' id='editor' enctype="multipart/form-data">
     <input type='text' name='title' placeholder='Title'>
@@ -26,12 +26,14 @@
   <div style='background-color: #014e44;'>
     <br>
     <div class='row'>
-      <div class='col-1'>
+      <div class='col-2'>
         <br>
       </div>
-      <div class='col-10' id='preview' style='background-color: white;'>
+      <div class='col-8' style='background-color: white;'>
+        <div id='preview' style='width: 100%;'>
+        </div>
       </div>
-      <div class='col-1'>
+      <div class='col-2'>
         <br>
       </div>
     </div>
