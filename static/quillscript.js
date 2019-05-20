@@ -33,6 +33,7 @@ function lne() {
   quill.setContents(deltaOps);
 }
 function ean() {
+  $('#titlep').text($('#title').val());
   $('#catep').text($('#cate').val());
   previewer.setContents(quill.getContents());
 }
