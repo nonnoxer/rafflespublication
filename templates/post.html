@@ -7,11 +7,11 @@
   <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
 </head>
-<body onload='lne(); ean()' oninput='ean()'>
+<body onload='lne(); ean()' onkeyup='ean()' onclick='ean()'>
   <h1>{{ title }}</h1>
   <p>Edit</p>
   <form id='editor' action='/editpost/{{title}}' method='POST' enctype="multipart/form-data">
-    <input type='text' name='title' readonly value='{{ title }}' id='title'>
+    <input type='text' name='title' readonly value='{{ title }}'>
     <br>
     <p><input type='text' name='categories' value='{{ categories }}' placeholder='Categories' id='cate'> (Separated with commas)</p>
     <p>File icon: <input type='file' name='icon' accept='image/*'> (Ideal size 128x128)</p>
@@ -23,24 +23,30 @@
     <br>
     <button onclick='dewit()'>Edit</button>
   </form>
-  <button onclick='ean()'>Preview</button>
   <p>Delete</p>
   <form action='/deletedpost' method='POST'>
     <input type="text" value="{{title}}" name="title" style="display: none;">
     <input type='submit' value='Delete'>
   </form>
-  <h3>Preview</h3>
+  <h3 name='preview'>Preview</h3>
   <div style='background-color: #014e44;'>
     <br>
     <div class='row'>
-      <div class='col-2'>
+      <div class='col-1'>
         <br>
       </div>
-      <div class='col-8' style='background-color: white;'>
-        <div id='preview' style='width: 100%;'>
+      <div class='col-10' style='background-color: white;'>
+        <div class='row'>
+          <div class='col-12'>
+            <h1><img src='/static/files/{{icon}}' class='icon'>{{ title }}</h1>
+            <p><strong>Categories: </strong><a id='catep' href='#preview'></a></p>
+            <div id='preview' style="width: 100%; background-color: white;">
+            </div>
+            <br>
+          </div>
         </div>
       </div>
-      <div class='col-2'>
+      <div class='col-1'>
         <br>
       </div>
     </div>

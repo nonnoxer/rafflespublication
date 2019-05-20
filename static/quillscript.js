@@ -14,7 +14,7 @@ var quill = new Quill('#editor-container', {
 });
 
 var previewer =  new Quill('#preview', {
-  theme: 'snow',
+  theme: 'bubble',
   modules: {
       toolbar: false,
   },
@@ -33,5 +33,6 @@ function lne() {
   quill.setContents(deltaOps);
 }
 function ean() {
+  $('#catep').text($('#cate').val());
   previewer.setContents(quill.getContents());
 }
