@@ -211,8 +211,15 @@ def createpost():
 				categories = categories.replace(', ', ',')
 			text = request.form['text']
 			summary = request.form['summary']
-			if str(request.files['icon']) == "<FileStorage: '' ('application/octet-stream')>":
+
+			#print(request.files)
+			#print(request.form)
+			if request.form['icon'] == "":
 				filename = 'default.png'
+
+			##Error code!!	
+			#if str(request.files['icon']) == "<FileStorage: '' ('application/octet-stream')>":
+				#filename = 'default.png'
 			else:
 				f = open('databases/config.txt', 'r')
 				f = f.readlines()
@@ -220,7 +227,7 @@ def createpost():
 				fname = str(fname)
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
-				icon.save('static/' +  secure_filename(filename))
+				icon.save(os.path.join('static', 'files', secure_filename(filename)))
 				f = open('databases/config.txt', 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
@@ -277,8 +284,10 @@ def editpost(title):
 			f = f.readlines()
 			fname = f[0].strip()
 			fname = str(fname)
-			print(str(request.files['icon']))
-			if str(request.files['icon']) == "<FileStorage: '' ('application/octet-stream')>":
+			#print(str(request.files['icon']))
+			
+			if request.form['icon'] == "":
+				#blank no change to icon
 				with sql.connect('databases/posts.db') as conn:
 					cur = conn.cursor()
 					cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
@@ -315,7 +324,12 @@ def deletedpost():
 			title = request.form['title']
 			with sql.connect('databases/posts.db') as conn:
 				cur = conn.cursor()
-				results = cur.execute('DELETE FROM posts WHERE title==?;', (title,))
+				
+				results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
+				if results[0] != 'default.png':
+					os.remove(os.path.join('static', 'files', results[0]))
+
+				cur.execute('DELETE FROM posts WHERE title==?;', (title,))
 				conn.commit()
 			return redirect('/admin')
 	else:
@@ -540,21 +554,34 @@ def search():
 		with sql.connect('databases/posts.db') as conn:
 			cur = conn.cursor()
 			result = cur.execute('SELECT title, categories FROM posts').fetchall()
+
+		with sql.connect('databases/pages.db') as conn:
+			cur = conn.cursor()
+			result2 = cur.execute('SELECT title FROM pages').fetchall()
+		
 		results = []
 		categore = []
+		pagelist = []
+
 		content = ''
 		cattent = ''
+		pagetent = ''
+
 		for i in result:
-			try:
-				if re.search(search.lower(), i[0].lower()):
-					results.append(i[0])
-				if re.search(search.lower(), i[1].lower()) and i[1] not in categore:
-					categore.append(i[1])
-			except:
-				pass
-		if results == [] and categore == []:
+			if re.search(search.lower(), i[0].lower()):
+				results.append(i[0])
+			if re.search(search.lower(), i[1].lower()) and i[1] not in categore:
+				categore.append(i[1])
+
+		for i in result2:
+			if re.search(search.lower(), i[0].lower()):
+				pagelist.append(i[0])			
+
+
+		if results == [] and categore == [] and pagelist == []:
 			content = "Nothing here, sorry!"
 			cattent = "Nothing here, sorry!"
+			pagetent = "Nothing here, sorry!"
 		else:
 			if results !=[]:
 				for i in results:
@@ -576,22 +603,48 @@ def search():
 					</div>''' + content
 			else:
 				content = "Nothing here, sorry!"
+
 			if categore != []:
 				for i in categore:
 					cattent = '<a href="/category/' + i + '">' + i + '</a>' + cattent
 			else:
 				cattent = 'Nothing here, sorry!'
+
+			if pagelist != []:
+				for i in pagelist:
+					pagetent = '''<div class="container">
+						<div class="row">
+							<div style="margin: 15px 0px 15px 0px;" class="col-12">
+								<a href="/''' + i + '''">
+									<h3>''' + i + '''</h3>
+								</a>
+							</div>
+						</div>
+					</div>''' + pagetent
+			else:
+				pagetent = 'Nothing here, sorry!'
+		
 		content = '''<div class='col-12 body'>
-			<h1>''' + "Search" + '''</h1>
-			<form action='/search' method='POST'>
-				<input type='text' name='search' placeholder='Search...' value="''' + search + '''">
-				<button type='submit' style='background: None; border: None;'><i class="fa fa-search"></i></button>
-			</form>
-			<h3>Posts</h3>
-			<p>''' + content + '''</p>
-			<h3>Categories</h3>
-			<p>''' + cattent + '''</p>
-		</div>'''
+				<h1>Search</h1>
+				<form action='/search' method='POST'>
+					<input type='text' name='search' placeholder='Search...' value="''' + search + '''">
+					<button type='submit' style='background: None; border: None;'><i class="fa fa-search"></i></button>
+				</form>
+			</div>
+			<div class="col-12 body">
+				<h3>Posts</h3>
+				<p>''' + content + '''</p>
+			</div>
+			<div class="col-12 body">
+				<h3>Categories</h3>
+				<p>''' + cattent + '''</p>
+			</div>
+			<div class="col-12 body">
+				<h3>Pages</h3>
+				<p>''' + pagetent + '''</p>
+			</div>
+			'''
+
 		return render_template('content.html', content=Markup(content))
 
 @app.route('/<title>')
@@ -602,12 +655,32 @@ def serveFile(title):
 	if results == []:
 		return render_template('content.html', title='Error', content=Markup(errorstring))
 	else:
-		results[0] = list(results[0])
-		results[0][1] = results[0][1].replace('\r\n', '<br>')
-		content = '''<div class='col-12 body'>
-		  <h1>''' + results[0][0] + '''</h1></div>'''
-		return render_template('viewcontent.html', content=Markup(content), posttext = Markup(results[0][1]))
+		results = list(results[0])
+		#results[1] = results[1].replace('\r\n', '<br>')
+		content = '''
+		<div class='col-12 body'>
+		  <h1>''' + results[0] + '''</h1>
+		</div>
+		<div id="editor" style="width: 100%;background-color: white;"></div>
 
+		<p id="datasource" style="display: none;">''' + results[1] + '''</p>
+		
+		<script type="text/javascript">
+			var quill = new Quill('#editor', {
+			theme: 'bubble',
+			"modules": {
+				"toolbar": false,
+			},
+			readOnly: true,
+			});
+			mystring = document.getElementById("datasource").textContent;
+			var mydelta = JSON.parse(mystring);
+			var deltaOps =  mydelta["ops"];
+			quill.setContents(deltaOps);
+
+		</script>'''
+		return render_template('content.html', content=Markup(content))
+		#return str(results)
 
 @app.route('/post/<title>')
 def servePost(title):
@@ -626,8 +699,9 @@ def servePost(title):
 		categories = categories[:len(categories) - 2] + '</p>'
 
 		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + results[0][0] + "</h1><p>" + categories + '''</p></div>
+		
 		<div id="editor" style="width: 100%;background-color: white;"></div>
-		</div>
+
 		<p id="datasource" style="display: none;">''' + results[0][2] + '''</p>
 		<script type="text/javascript">
 			var quill = new Quill('#editor', {
@@ -644,4 +718,7 @@ def servePost(title):
 		</script>'''
 		return render_template('content.html', content=Markup(content))
 
-app.run(debug=True)
+
+
+if __name__ == "__main__":
+	app.run(debug=True)
