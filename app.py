@@ -532,7 +532,8 @@ def feedbacked():
 			results = cur.execute('SELECT * FROM feedback;').fetchall()
 		feedback = ''
 		for i in results:
-			feedback = feedback + '<tr><form action="deletedfeedback" method="POST" id="feedbacker"><td>' + i[0] + '</td><td>' + i[1] + '</td><td><textarea form="feedbacker" name="feedback" rows="4" readonly>' + i[2] + '</textarea></td><td><input type="submit" value="Delete"></form></tr>'
+			feedback = feedback + '<tr><form action="/deletedfeedback" method="POST" id="feedbacker"><td>' + i[0] + '</td><td>' + i[1] + '</td><td><input name="feedback" value="' + i[2] + '" hidden readOnly>' + i[2] + '</td><td class="bigdelete"> \
+			<center><button form="feedbacker" type="submit" class="btn btn-outline-danger">Delete</button></center></td></form></tr>'
 		return render_template('feedback.html', feedback=Markup(feedback))
 	else:
 		return render_template('login.html')
@@ -541,6 +542,7 @@ def feedbacked():
 def deletedfeedback():
 	if request.method == 'POST':
 		feedback = request.form['feedback']
+		print(feedback)
 		with sql.connect('databases/feedback.db') as conn:
 			cur = conn.cursor()
 			cur.execute('DELETE FROM feedback WHERE feedback==?;', (feedback,))

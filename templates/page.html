@@ -3,29 +3,85 @@
   <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+   <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
   <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
   <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">
+  <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
 </head>
-<body onload='lne()'>
-  <h1>{{ title }}</h1>
-  <p>Edit</p>
 
-  <form action='/editpage/{{title}}' method='POST' id='editor'>
-    <input type='text' name='title' readonly value='{{ title }}'>
-    <br>
-    <div id='editor-container'>
+<body onkeyup='ean()' onclick='ean()'>
+
+    <div style="padding: 20px 35px 0px 35px;">
+        
+        <div class="row">
+          <div class="col-2"><a href="/pages">&lt;&lt; back</a></div>
+          <div class="col-8"><h2 style="text-align: center;"><b>Editing - {{title}}</b></h2></div>
+          <div class="col-2"></div>
+        </div>
+        <hr>
+
+    <div class="row">
+
+      <div class="col-6 mb-5">
+        <h3 name='preview'>Edit/Delete</h3>
+
+        <form action='/editpage/{{title}}' method='POST' id='editor'>
+        
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="id1">Title</span>
+          </div>
+          <input type="text" name="title" class="form-control" aria-label="Default" id="title" aria-describedby="id1" value='{{ title }}' readonly>
+        </div>
+
+
+        <div id='editor-container' class="mb-3" style="min-height: 240px;"></div>
+        <textarea form='editor' name='text' id="text" readonly hidden>{{ content }}</textarea>
+        
+
+        <center><button onclick='dewit()' form="editor" type="button" class="btn btn-outline-primary">Save edited page</button></center>
+
+        </form>
+
+      </div>
+
+
+      <div class="col-6">
+          <h3 name='preview'>Preview</h3>
+          <div style='background-color: #014e44;padding: 20px;'>
+            <div class='container'>
+              <div class='row'>
+                <div class='col-12' style='background-color: white;padding: 10px 15px;'>
+                  <h1>{{ title }}</h1>
+                </div>
+                    
+                <div id='preview' style="width: 100%; background-color: white;"></div>
+              </div>
+            </div>
+          </div>
+          <p>Start editing the left panel, your page will be rendered live as you edit.</p>
+          <form action='/deletedpage' id="deletor" method='POST'>
+            <input type="text" value="{{title}}" name="title" style="display: none;">
+            <center><button form="deletor" type="submit" class="btn btn-outline-danger mt-3">Delete page</button></center>
+          </form>
+
+      </div>
+
+
+
     </div>
-    <textarea form='editor' name='text' readonly id='text' hidden>{{ content }}</textarea>
-    <br>
-    <button onclick='dewit()'>Edit</button>
-  </form>
+  </div>
   
-  <p>Delete</p>
-  <form action='/deletedpage' method='POST'>
-    <input type="text" value="{{title}}" name="title" style="display: none;">
-    <br>
-    <input type='submit' value='Delete'>
-  </form>
-  <script src='{{ url_for('static', filename='quillscript.js') }}'></script>
+  <script src="{{ url_for('static', filename='quillscript.js') }}"></script>
+  <script type="text/javascript">
+    lne();
+    ean();
+  </script>
+
+
 </body>

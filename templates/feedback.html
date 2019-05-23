@@ -3,16 +3,39 @@
   <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
   <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
 </head>
-<body>
-  <h1>Feedback</h1>
-  <table>
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Feedback</th>
-    </tr>
-    {{ feedback }}
-  </table>
+<body class="pt-3">
+  <div class="container">
+    
+    <h1>Feedback</h1>
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Feedback</th>
+      </tr>
+      {{ feedback }}
+    </table>
+
+  </div>
 </body>
+
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+  }
+
+  th,td {
+    padding: 5px;
+  }
+
+  #bigdelete {
+    border: none;
+  }
+</style>
