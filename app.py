@@ -228,7 +228,7 @@ def createpost():
 				fname = str(fname)
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
-				icon.save(os.path.join('static', 'files', secure_filename(filename)))
+				icon.save(os.path.join(bigbigstring, 'static', 'files', secure_filename(filename)))
 				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
@@ -295,7 +295,7 @@ def editpost(title):
 			else:
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
-				icon.save(os.path.join('static', 'files', secure_filename(filename)))
+				icon.save(os.path.join(bigbigstring, 'static', 'files', secure_filename(filename)))
 				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
@@ -303,7 +303,7 @@ def editpost(title):
 					cur = conn.cursor()
 					results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
 				if results[0] != 'default.png':
-					os.remove(os.path.join('static', 'files', results[0]))
+					os.remove(os.path.join(bigbigstring, 'static', 'files', results[0]))
 				with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 					cur = conn.cursor()
 					cur.execute('UPDATE posts SET text=?, categories=?, summary=?, icon=? WHERE title==?;', (text, categories, summary, filename, title))
@@ -328,7 +328,7 @@ def deletedpost():
 				
 				results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
 				if results[0] != 'default.png':
-					os.remove(os.path.join('static', 'files', results[0]))
+					os.remove(os.path.join(bigbigstring, 'static', 'files', results[0]))
 
 				cur.execute('DELETE FROM posts WHERE title==?;', (title,))
 				conn.commit()
