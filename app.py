@@ -8,21 +8,22 @@ import re
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-with sql.connect('databases/users.db') as conn:
-	conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
-with sql.connect('databases/posts.db') as conn:
-	conn.execute('CREATE TABLE IF NOT EXISTS posts(title, categories, text, summary, icon);')
-with sql.connect('databases/pages.db') as conn:
-	conn.execute('CREATE TABLE IF NOT EXISTS pages(title, text);')
-with sql.connect('databases/feedback.db') as conn:
-	conn.execute('CREATE TABLE IF NOT EXISTS feedback(name, email, feedback);')
+bigbigstring = os.path.dirname(os.path.realpath(__file__))
 
+with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
+	conn.execute('CREATE TABLE IF NOT EXISTS users(username, password);')
+with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
+	conn.execute('CREATE TABLE IF NOT EXISTS posts(title, categories, text, summary, icon);')
+with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
+	conn.execute('CREATE TABLE IF NOT EXISTS pages(title, text);')
+with sql.connect(os.path.join(bigbigstring,'databases/feedback.db')) as conn:
+	conn.execute('CREATE TABLE IF NOT EXISTS feedback(name, email, feedback);')
 
 errorstring = "<div class='body' style='width:100%;'><b>404: File does not exist</b></div>"
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
-	with sql.connect('databases/posts.db') as conn:
+	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts;').fetchall()
 	result = []
@@ -87,7 +88,7 @@ def admin():
 	else:
 		username = request.form['username']
 		password = request.form['password']
-		with sql.connect('databases/users.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT * FROM users WHERE username==?;', (username,)).fetchall()
 		if results == []:
@@ -107,13 +108,13 @@ def createuser():
 			username = request.form['username']
 			password = request.form['password']
 			password = sha256_crypt.encrypt(password)
-			with sql.connect('databases/users.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('SELECT username FROM users WHERE username==? AND password==?;', (username,password)).fetchone()
 			if results != None:
 				return render_template('error.html', error='User already exists')
 			else:
-				with sql.connect('databases/users.db') as conn:
+				with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 					cur = conn.cursor()
 					cur.execute('INSERT INTO users VALUES (?,?);', (username, password))
 					conn.commit()
@@ -128,7 +129,7 @@ def createuser():
 @app.route('/users')
 def users():
 	if 'user' in session:
-		with sql.connect('databases/users.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT * FROM users;').fetchall()
 		users = ''
@@ -141,7 +142,7 @@ def users():
 @app.route('/edituser/<username>')
 def edituser(username):
 	if 'user' in session:
-		with sql.connect('databases/users.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
 		if results == None:
@@ -158,7 +159,7 @@ def editedusername():
 		username = request.form['username']
 		newname = request.form['newname']
 
-		with sql.connect('databases/users.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			cur.execute('UPDATE users SET username=? WHERE username==?', (newname, username))
 			conn.commit()
@@ -174,7 +175,7 @@ def editedpassword():
 		newpass = request.form['newpass']
 		newpass = sha256_crypt.encrypt(newpass)
 
-		with sql.connect('databases/users.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			cur.execute('UPDATE users SET password=? WHERE username==?', (newpass, username))
 			conn.commit()
@@ -186,7 +187,7 @@ def editedpassword():
 def deleteduser():
 	if 'user' in session:
 		username = request.form['username']
-		with sql.connect('databases/users.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('DELETE FROM users WHERE username==?;', (username,))
 			conn.commit()
@@ -214,24 +215,24 @@ def createpost():
 
 			#print(request.files)
 			#print(request.form)
-			if request.form['icon'] == "":
+			if 'icon' in request.form and request.form['icon'] == "":
 				filename = 'default.png'
 
 			##Error code!!	
 			#if str(request.files['icon']) == "<FileStorage: '' ('application/octet-stream')>":
 				#filename = 'default.png'
 			else:
-				f = open('databases/config.txt', 'r')
+				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'r')
 				f = f.readlines()
 				fname = f[0].strip()
 				fname = str(fname)
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
 				icon.save(os.path.join('static', 'files', secure_filename(filename)))
-				f = open('databases/config.txt', 'w')
+				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
-			with sql.connect('databases/posts.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
 				cur.execute('INSERT INTO posts VALUES (?,?,?,?,?);', (title, categories, text, summary, filename))
 				conn.commit()
@@ -245,7 +246,7 @@ def createpost():
 @app.route('/posts')
 def posts():
 	if 'user' in session:
-		with sql.connect('databases/posts.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT * FROM posts;').fetchall()
 		result = []
@@ -262,7 +263,7 @@ def posts():
 def editpost(title):
 	if 'user' in session:
 		if request.method == "GET":
-			with sql.connect('databases/posts.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
 			if results == []:
@@ -280,15 +281,14 @@ def editpost(title):
 
 			text = request.form['text']
 			summary = request.form['summary']
-			f = open('databases/config.txt', 'r')
+			f = open(os.path.join(bigbigstring,'databases/config.txt'), 'r')
 			f = f.readlines()
 			fname = f[0].strip()
 			fname = str(fname)
-			#print(str(request.files['icon']))
-			
-			if request.form['icon'] == "":
+
+			if 'icon' in request.form and request.form['icon'] == "":
 				#blank no change to icon
-				with sql.connect('databases/posts.db') as conn:
+				with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 					cur = conn.cursor()
 					cur.execute('UPDATE posts SET text=?, categories=?, summary=? WHERE title==?;', (text, categories, summary, title))
 					conn.commit()
@@ -296,18 +296,19 @@ def editpost(title):
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
 				icon.save(os.path.join('static', 'files', secure_filename(filename)))
-				f = open('databases/config.txt', 'w')
+				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
-				with sql.connect('databases/posts.db') as conn:
+				with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 					cur = conn.cursor()
 					results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
 				if results[0] != 'default.png':
 					os.remove(os.path.join('static', 'files', results[0]))
-				with sql.connect('databases/posts.db') as conn:
+				with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 					cur = conn.cursor()
 					cur.execute('UPDATE posts SET text=?, categories=?, summary=?, icon=? WHERE title==?;', (text, categories, summary, filename, title))
 					conn.commit()
+			
 			return redirect('/admin')
 
 	else:
@@ -322,7 +323,7 @@ def deletedpost():
 	if 'user' in session:
 		if request.method == 'POST':
 			title = request.form['title']
-			with sql.connect('databases/posts.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
 				
 				results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
@@ -343,7 +344,7 @@ def createpage():
 		else:
 			title = request.form['title']
 			text = request.form['text']
-			with sql.connect('databases/pages.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
 				cur.execute('INSERT INTO pages VALUES (?,?);', (title, text))
 				conn.commit()
@@ -357,7 +358,7 @@ def createpage():
 @app.route('/pages')
 def pages():
 	if 'user' in session:
-		with sql.connect('databases/pages.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT * FROM pages;').fetchall()
 		result = []
@@ -374,7 +375,7 @@ def pages():
 def editpage(title):
 	if 'user' in session:
 		if request.method == "GET":
-			with sql.connect('databases/pages.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
 			if results == []:
@@ -384,7 +385,7 @@ def editpage(title):
 		else:
 			title = request.form['title']
 			text = request.form['text']
-			with sql.connect('databases/pages.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('UPDATE pages SET text=? WHERE title==?;', (text, title))
 				conn.commit()
@@ -402,7 +403,7 @@ def deletedpage():
 	if 'user' in session:
 		if request.method == 'POST':
 			title = request.form['title']
-			with sql.connect('databases/pages.db') as conn:
+			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('DELETE FROM pages WHERE title==?;', (title,))
 				conn.commit()
@@ -417,7 +418,7 @@ def logout():
 
 @app.route('/works')
 def works():
-	with sql.connect('databases/posts.db') as conn:
+	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts;').fetchall()
 
@@ -444,7 +445,7 @@ def works():
 
 @app.route('/categories')
 def categories():
-	with sql.connect('databases/posts.db') as conn:
+	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT categories FROM posts;').fetchall()
 	result = set()
@@ -464,7 +465,7 @@ def categories():
 
 @app.route('/category/<category>')
 def category(category):
-	with sql.connect('databases/posts.db') as conn:
+	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts;').fetchall()
 	result = []
@@ -500,7 +501,7 @@ def other():
 		<a href="/works"><h4>Works</h4></a>
 		<a href="/categories"><h4>Categories</h4></a>'''
 
-	with sql.connect('databases/pages.db') as conn:
+	with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM pages').fetchall()
 	for i in results:
@@ -518,7 +519,7 @@ def feedback():
 		name = request.form['name']
 		email = request.form['email']
 		feedback = request.form['feedback']
-		with sql.connect('databases/feedback.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/feedback.db')) as conn:
 			cur = conn.cursor()
 			cur.execute('INSERT INTO feedback VALUES (?,?,?);', (name, email, feedback))
 			conn.commit()
@@ -527,7 +528,7 @@ def feedback():
 @app.route('/feedbacked')
 def feedbacked():
 	if 'user' in session:
-		with sql.connect('databases/feedback.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/feedback.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT * FROM feedback;').fetchall()
 		feedback = ''
@@ -543,7 +544,7 @@ def deletedfeedback():
 	if request.method == 'POST':
 		feedback = request.form['feedback']
 		print(feedback)
-		with sql.connect('databases/feedback.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/feedback.db')) as conn:
 			cur = conn.cursor()
 			cur.execute('DELETE FROM feedback WHERE feedback==?;', (feedback,))
 			conn.commit()
@@ -553,11 +554,11 @@ def deletedfeedback():
 def search():
 	if request.method == 'POST':
 		search = request.form['search']
-		with sql.connect('databases/posts.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 			cur = conn.cursor()
 			result = cur.execute('SELECT title, categories FROM posts').fetchall()
 
-		with sql.connect('databases/pages.db') as conn:
+		with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 			cur = conn.cursor()
 			result2 = cur.execute('SELECT title FROM pages').fetchall()
 		
@@ -587,7 +588,7 @@ def search():
 		else:
 			if results !=[]:
 				for i in results:
-					with sql.connect('databases/posts.db') as conn:
+					with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 						cur = conn.cursor()
 						result = cur.execute('SELECT * FROM posts WHERE title==?;', (i,)).fetchall()
 					content ='''<div class="container">
@@ -651,7 +652,7 @@ def search():
 
 @app.route('/<title>')
 def serveFile(title):
-	with sql.connect('databases/pages.db') as conn:
+	with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
 	if results == []:
@@ -686,7 +687,7 @@ def serveFile(title):
 
 @app.route('/post/<title>')
 def servePost(title):
-	with sql.connect('databases/posts.db') as conn:
+	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
 	if results == []:
@@ -723,4 +724,4 @@ def servePost(title):
 
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run(debug=False)
