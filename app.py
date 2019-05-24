@@ -218,7 +218,7 @@ def createpost():
 			if 'icon' in request.form and request.form['icon'] == "":
 				filename = 'default.png'
 
-			##Error code!!	
+			##Error code!!
 			#if str(request.files['icon']) == "<FileStorage: '' ('application/octet-stream')>":
 				#filename = 'default.png'
 			else:
@@ -228,7 +228,7 @@ def createpost():
 				fname = str(fname)
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
-				icon.save(os.path.join('static', 'files', secure_filename(filename)))
+				icon.save(os.path.join(bigbigstring ,'static', 'files', secure_filename(filename)))
 				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
@@ -295,7 +295,7 @@ def editpost(title):
 			else:
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
-				icon.save(os.path.join('static', 'files', secure_filename(filename)))
+				icon.save(os.path.join(bigbigstring, 'static', 'files', secure_filename(filename)))
 				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
@@ -303,12 +303,12 @@ def editpost(title):
 					cur = conn.cursor()
 					results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
 				if results[0] != 'default.png':
-					os.remove(os.path.join('static', 'files', results[0]))
+					os.remove(os.path.join(bigbigstring, 'static', 'files', results[0]))
 				with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 					cur = conn.cursor()
 					cur.execute('UPDATE posts SET text=?, categories=?, summary=?, icon=? WHERE title==?;', (text, categories, summary, filename, title))
 					conn.commit()
-			
+
 			return redirect('/admin')
 
 	else:
@@ -325,10 +325,10 @@ def deletedpost():
 			title = request.form['title']
 			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
-				
+
 				results = cur.execute('SELECT icon FROM posts WHERE title==?;', (title,)).fetchone()
 				if results[0] != 'default.png':
-					os.remove(os.path.join('static', 'files', results[0]))
+					os.remove(os.path.join(bigbigstring, 'static', 'files', results[0]))
 
 				cur.execute('DELETE FROM posts WHERE title==?;', (title,))
 				conn.commit()
@@ -561,7 +561,7 @@ def search():
 		with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 			cur = conn.cursor()
 			result2 = cur.execute('SELECT title FROM pages').fetchall()
-		
+
 		results = []
 		categore = []
 		pagelist = []
@@ -578,7 +578,7 @@ def search():
 
 		for i in result2:
 			if re.search(search.lower(), i[0].lower()):
-				pagelist.append(i[0])			
+				pagelist.append(i[0])
 
 
 		if results == [] and categore == [] and pagelist == []:
@@ -626,7 +626,7 @@ def search():
 					</div>''' + pagetent
 			else:
 				pagetent = 'Nothing here, sorry!'
-		
+
 		content = '''<div class='col-12 body'>
 				<h1>Search</h1>
 				<form action='/search' method='POST'>
@@ -667,7 +667,7 @@ def serveFile(title):
 		<div id="editor" style="width: 100%;background-color: white;"></div>
 
 		<p id="datasource" style="display: none;">''' + results[1] + '''</p>
-		
+
 		<script type="text/javascript">
 			var quill = new Quill('#editor', {
 			theme: 'bubble',
@@ -702,7 +702,7 @@ def servePost(title):
 		categories = categories[:len(categories) - 2] + '</p>'
 
 		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + results[0][0] + "</h1><p>" + categories + '''</p></div>
-		
+
 		<div id="editor" style="width: 100%;background-color: white;"></div>
 
 		<p id="datasource" style="display: none;">''' + results[0][2] + '''</p>
