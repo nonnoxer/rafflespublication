@@ -53,7 +53,7 @@ def root():
 				</div>
 				<div style="margin: 15px 0px 15px 0px;" class="col-9">
 					<a href="/post/''' + i[0] + '''">
-						<h3>''' + i[0] + '''</h3>
+						<h3>''' + qntosafe(i[0]) + '''</h3>
 					</a>
 					<p>''' + i[3] + '''</p>
 				</div>
