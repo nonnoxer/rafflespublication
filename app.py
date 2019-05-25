@@ -29,7 +29,7 @@ def qntosafe(mystring):
 	return mystring
 
 def safetoqn(mystring):
-	if "-qn-" in mystring:
+	if "--qn--" in mystring:
 		mystring = mystring.replace("--qn--", "?")
 	#mystring = html.unescape(mystring)
 	return mystring
@@ -53,7 +53,7 @@ def root():
 				</div>
 				<div style="margin: 15px 0px 15px 0px;" class="col-9">
 					<a href="/post/''' + i[0] + '''">
-						<h3>''' + qntosafe(i[0]) + '''</h3>
+						<h3>''' + safetoqn(i[0]) + '''</h3>
 					</a>
 					<p>''' + i[3] + '''</p>
 				</div>
