@@ -49,6 +49,7 @@ def root():
 		content = content + '''<div class="container">
 			<div class="row">
 				<div class="col-3" style="text-align: center;">
+					<span class="myhelper"></span>
 					<img src="/static/files/''' + i[4] + '''" class="icon">
 				</div>
 				<div style="margin: 15px 0px 15px 0px;" class="col-9">
@@ -162,7 +163,7 @@ def edituser(username):
 		if results == None:
 			return render_template('content.html', title='Error', content=Markup(errorstring))
 
-		return render_template('user.html', username=results[0])
+		return render_template('user.html', username=Markup(results[0]))
 	else:
 		return render_template('login.html')
 
@@ -287,7 +288,7 @@ def editpost(title):
 			if results == []:
 				return render_template('content.html', title='Error', content=Markup(errorstring))
 
-			return render_template('post.html', title=results[0][0], title2 = safetoqn(results[0][0]), categories=results[0][1], content=results[0][2], summary=results[0][3], icon=results[0][4])
+			return render_template('post.html', title=Markup(results[0][0]), title2 = Markup(safetoqn(results[0][0])), categories=Markup(results[0][1]), content=Markup(results[0][2]), summary=Markup(results[0][3]), icon=Markup(results[0][4]))
 		else:
 			title = qntosafe(request.form['title'])
 			categories = request.form['categories']
@@ -399,7 +400,7 @@ def editpage(title):
 			if results == []:
 				return render_template('content.html', title='Error', content=Markup(errorstring))
 
-			return render_template('page.html', title=results[0][0], title2 = safetoqn(results[0][0]), content=results[0][1])
+			return render_template('page.html', title=Markup(results[0][0]), title2 = Markup(safetoqn(results[0][0])), content=Markup(results[0][1]))
 		else:
 			title = qntosafe(request.form['title'])
 			text = request.form['text']
@@ -445,6 +446,7 @@ def works():
 		content ='''<div class="container">
 			<div class="row">
 				<div class="col-2" style="text-align: center;">
+					<span class="myhelper"></span>
 					<img src="/static/files/''' + i[4] + '''" class="icon">
 				</div>
 				<div style="margin: 15px 0px 15px 0px;" class="col-10">
@@ -495,6 +497,7 @@ def category(category):
 				content = '''<div class="container">
 					<div class="row">
 						<div class="col-2" style="text-align: center;">
+							<span class="myhelper"></span>
 							<img src="/static/files/''' + i[4] + '''" class="icon">
 						</div>
 						<div style="margin: 15px 0px 15px 0px;" class="col-10">
@@ -612,6 +615,7 @@ def search():
 					content ='''<div class="container">
 						<div class="row">
 							<div class="col-2" style="text-align: center;">
+								<span class="myhelper"></span>
 								<img src="/static/files/''' + result[0][4] + '''" class="icon">
 							</div>
 							<div style="margin: 15px 0px 15px 0px;" class="col-10">
@@ -714,12 +718,13 @@ def servePost(title):
 		results[0] = list(results[0])
 		results[0][2] = results[0][2].replace('\r\n', '<br>')
 		results[0][1] = results[0][1].split(',')
-		categories = '<p><strong>Categories: </strong>'
+		categories = "<p><strong>Categories: </strong>"
 		for i in results[0][1]:
 			categories = categories + '<a href="/category/' +  i + '">' + i + '</a>, '
 		categories = categories[:len(categories) - 2] + '</p>'
 
-		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + safetoqn(results[0][0]) + "</h1><p>" + categories + '''</p></div>
+		content = "<div class='col-3 col-xs4 bg-white' style='text-align:center'> \
+		<span class='myhelper'></span><img src='/static/files/" + results[0][4] + "' class='icon'></div><div class='col-9 col-xs8 post_head bg-white'><h1 style='width:100%;margin:0;'>" + safetoqn(results[0][0]) + "</h1>" + categories + '''</div>
 
 		<div id="editor" style="width: 100%;background-color: white;"></div>
 
@@ -741,16 +746,17 @@ def servePost(title):
 
 @app.route('/test')
 def test():
-	pass
+	#stuff = ('Castles can fly--qn--', '2018', '{"ops":[{"insert":"\\t"},{"attributes":{"background":"transparent","color":"#000000"},"insert":"On the 3rd of January, the batch of 2017, the Year 2s of Raffles Institution, went to a distant beach to have some fun. What a way to start the year by building sandcastles with my classmates! It was a sunny day, honestly quite a surprise as it had been raining cats and dogs the past few days. Mr Lee did say the day before we went to the beach to build sandcastles that it did not matter what had happened in the past, but the important thing was to believe in the future. I was starting to think that the man would be proven wrong when it started to rain at the beach tomorrow. After all, the weather forecast predicted that it would rain tomorrow. I could almost imagine the picture of him sitting on a red plastic chair at East Coast Beach under a sheltered place, cheek rested on his clenched fist, pondering about what to tell the students, who would be glaring daggers at him. Maybe he would say, “What you believe might happen may not happen all the time. Welcome to Reality.” Anyway, when we arrived at the beach, we saw the glorious ball of burning helium sending rays of blinding light down to earth. Mouths agape, the students proceeded to put their bags down and listen to the briefing by Mr. Lee. "},{"insert":"\\n"},{"attributes":{"background":"transparent","color":"#000000"},"insert":" \xa0\xa0\xa0\xa0The briefing lasted about half an hour, after which we proceeded to complete our seemingly easy task of building sandcastles. Long story short, building a real castle was much easier than building a sandcastle. The sun was scorching and we used what Mr Lee told us “was a spade (and not a shovel)” to dig sand to build the castles and used the seawater to strengthen the sand enough to allow it to stand independently without crumbling. Everyone seemed to be having a literal whale of a time, other than my team. Granted, my team was building sandcastles, some of us in the air, some of us on the beach. We were divided, as everyone had a different idea of how our sandcastle should look like. Three hours quickly went by, and you will not believe what our sandcastle looked like. It was a complete mess, to say the least. Mrs Soh, who came to take a nice photograph of our sandcastle, gave us a look that made me think about how a group of Rafflesians cannot even build a simple sandcastle in such a long time, and all my team could build was a sad looking sandcastle that soon crumbled after the photo was taken. Before the castle was smashed open by my team members (including myself, of course) for fear of people looking at it and pop our Rafflesian sized ego balloon, I had buried a beer bottle we found at the beach underneath the sandcastle for luck. Somebody once said that you do not mess with karma, and I should have heeded his advice for when I gave the sandcastle a big kick, the beer bottle bit my feet. I now have a cut on my left foot."},{"insert":"\\n"},{"attributes":{"background":"transparent","color":"#000000"},"insert":"\\tThe beach was like a magnificent metropolis of sandcastles, some beautiful, some big, some small, some resembling a HDB flat. There were a lot of sandcastles (minus the one my team and I demolished) on the beach and it was a breathtaking view. The Y2s returned to Raffles soon after, some with the sense of accomplishment having built a sandcastle and some, not so much. Back at Raffles, when interviewed, Colin Low of 2B said that it was troublesome having to go to a distant beach to build sandcastles. To me, I felt that it was fun, but the beach was baking and that building an egg-shaped Marina Bay ‘Sands’castle (if you get the pun) was much harder than expected. All that really mattered was that everyone had fun, and that nobody would forget the silhouette of the man holding up a spade, then claiming it was a spade, fading into the dying light of evening as the sun descended into the sea. Then the metropolis on the beach would sleep, the lapping of the waves a lullaby for any imaginary sandman living in the sandcastles."},{"insert":"\\n\\n"}]}', '', 'default.png')
+	return "nothing here"
 
 @app.route('/print/<mode>')
 def myprint(mode):
 	if mode == "posts":
 		with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 			cur = conn.cursor()
-			results = cur.execute("SELECT * FROM posts").fetchall()
+			results = cur.execute("SELECT * FROM posts WHERE title=='Castles can fly--qn--' ").fetchall()
 
-		return str(results[0])
+		return str(results)
 
 	elif mode == "pages":
 		with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
@@ -761,4 +767,4 @@ def myprint(mode):
 
 
 if __name__ == "__main__":
-	app.run(debug=False)
+	app.run(debug=True)
