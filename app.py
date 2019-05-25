@@ -228,7 +228,7 @@ def createpost():
 				fname = str(fname)
 				icon = request.files['icon']
 				filename = fname + icon.filename[icon.filename.find('.'):]
-				icon.save(os.path.join(bigbigstring ,'static', 'files', secure_filename(filename)))
+				icon.save(os.path.join(bigbigstring, 'static', 'files', secure_filename(filename)))
 				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
@@ -721,6 +721,19 @@ def servePost(title):
 		</script>'''
 		return render_template('content.html', content=Markup(content))
 
+@app.route('/test/<mode>/<title>')
+def test(mode, title):
+	if mode == "posts":
+		with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
+			cur = conn.cursor()
+			cur.execute('DELETE FROM posts where title==?;', (title,))
+			conn.commit()
+	else:
+		with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
+			cur = conn.cursor()
+			cur.execute('DELETE FROM pages where title==?;', (title,))
+			conn.commit()
+	return "done"
 
 
 if __name__ == "__main__":

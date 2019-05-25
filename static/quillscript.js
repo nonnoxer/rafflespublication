@@ -1,7 +1,12 @@
+//var Size = Quill.import('attributors/style/size');
+//Quill.register(Size, true);
+
+
 var quill = new Quill('#editor-container', {
   modules: {
     toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }, { 'font': [] }, { 'size' : [ 'small', false, 'large', 'huge' ] }],
+      [{ 'header': [1, 2, 3, false, 5, 6,] }, { 'font': [] }, { 'size' : [ 'small', false, 'large', 'huge' ] }],
+      //[{ 'font': [] }, { 'size': ['10px', '20px', '80px'] }],
       ['bold', 'italic', 'underline', 'strike', { 'color': [] }, { 'background': [] }],
       [{ 'script': 'super' }, { 'script': 'sub' }, 'blockquote', 'code-block'],
       ['link', 'image'],
