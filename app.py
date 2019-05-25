@@ -4,6 +4,7 @@ import os
 from passlib.hash import sha256_crypt
 from werkzeug.utils import secure_filename
 import re
+import html
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -20,6 +21,19 @@ with sql.connect(os.path.join(bigbigstring,'databases/feedback.db')) as conn:
 	conn.execute('CREATE TABLE IF NOT EXISTS feedback(name, email, feedback);')
 
 errorstring = "<div class='body' style='width:100%;'><b>404: File does not exist</b></div>"
+
+def qntosafe(mystring):
+	if "?" in mystring:
+		mystring = mystring.replace("?", "--qn--")
+	mystring = html.escape(mystring)
+	return mystring
+
+def safetoqn(mystring):
+	if "-qn-" in mystring:
+		mystring = mystring.replace("--qn--", "?")
+	#mystring = html.unescape(mystring)
+	return mystring
+
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -203,7 +217,7 @@ def createpost():
 		if request.method == "GET":
 			return render_template('createpost.html')
 		else:
-			title = request.form['title']
+			title = qntosafe(request.form['title'])
 			categories = request.form['categories']
 			if categories == '':
 				categories = 'Uncategorised'
@@ -232,6 +246,10 @@ def createpost():
 				f = open(os.path.join(bigbigstring,'databases/config.txt'), 'w')
 				f.write(str(int(fname) + 1))
 				f.close()
+			
+			categories = html.escape(categories)
+			summary = html.escape(summary)
+
 			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
 				cur.execute('INSERT INTO posts VALUES (?,?,?,?,?);', (title, categories, text, summary, filename))
@@ -254,7 +272,7 @@ def posts():
 			result.append(results.pop())
 		content = ''
 		for i in result:
-			content = content + '<a href="/editpost/' + i[0] + '">' + i[0] + '</a><br>'
+			content = content + '<a href="/editpost/' + i[0] + '">' + safetoqn(i[0]) + '</a><br>'
 		return render_template('posts.html', content=Markup(content))
 	else:
 		return render_template('login.html')
@@ -269,9 +287,9 @@ def editpost(title):
 			if results == []:
 				return render_template('content.html', title='Error', content=Markup(errorstring))
 
-			return render_template('post.html', title=results[0][0], categories=results[0][1], content=results[0][2], summary=results[0][3], icon=results[0][4])
+			return render_template('post.html', title=results[0][0], title2 = safetoqn(results[0][0]), categories=results[0][1], content=results[0][2], summary=results[0][3], icon=results[0][4])
 		else:
-			title = request.form['title']
+			title = qntosafe(request.form['title'])
 			categories = request.form['categories']
 			if categories == '':
 				categories = 'Uncategorised'
@@ -322,7 +340,7 @@ def editpost(title):
 def deletedpost():
 	if 'user' in session:
 		if request.method == 'POST':
-			title = request.form['title']
+			title = qntosafe(request.form['title'])
 			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
 
@@ -342,7 +360,7 @@ def createpage():
 		if request.method == 'GET':
 			return render_template('createpage.html')
 		else:
-			title = request.form['title']
+			title = qntosafe(request.form['title'])
 			text = request.form['text']
 			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
@@ -366,7 +384,7 @@ def pages():
 			result.append(results.pop())
 		content = ''
 		for i in result:
-			content = content + '<a href="/editpage/' + i[0] + '">' + i[0] + '</a><br>'
+			content = content + '<a href="/editpage/' + i[0] + '">' + safetoqn(i[0]) + '</a><br>'
 		return render_template('pages.html', content=Markup(content))
 	else:
 		return render_template('login.html')
@@ -381,9 +399,9 @@ def editpage(title):
 			if results == []:
 				return render_template('content.html', title='Error', content=Markup(errorstring))
 
-			return render_template('page.html', title=results[0][0], content=results[0][1])
+			return render_template('page.html', title=results[0][0], title2 = safetoqn(results[0][0]), content=results[0][1])
 		else:
-			title = request.form['title']
+			title = qntosafe(request.form['title'])
 			text = request.form['text']
 			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
@@ -402,7 +420,7 @@ def editpage(title):
 def deletedpage():
 	if 'user' in session:
 		if request.method == 'POST':
-			title = request.form['title']
+			title = qntosafe(request.form['title'])
 			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('DELETE FROM pages WHERE title==?;', (title,))
@@ -431,7 +449,7 @@ def works():
 				</div>
 				<div style="margin: 15px 0px 15px 0px;" class="col-10">
 					<a href="/post/''' + i[0] + '''">
-						<h3>''' + i[0] + '''</h3>
+						<h3>''' + safetoqn(i[0]) + '''</h3>
 					</a>
 					<p>''' + i[3] + '''</p>
 				</div>
@@ -481,7 +499,7 @@ def category(category):
 						</div>
 						<div style="margin: 15px 0px 15px 0px;" class="col-10">
 							<a href="/post/''' + i[0] + '''">
-								<h3>''' + i[0] + '''</h3>
+								<h3>''' + safetoqn(i[0]) + '''</h3>
 							</a>
 							<p>''' + i[3] + '''</p>
 						</div>
@@ -506,7 +524,7 @@ def other():
 		results = cur.execute('SELECT * FROM pages').fetchall()
 	for i in results:
 		if i[0] != 'About':
-			content = content + '<a href="/' + i[0] + '"><h4>' + i[0] + '</h4></a>'
+			content = content + '<a href="/' + i[0] + '"><h4>' + safetoqn(i[0]) + '</h4></a>'
 	content = '''<div class='col-12 body'>
 		<h1>''' + "All pages" + '''</h1>
 		<p>''' + content + '''</p>
@@ -553,7 +571,7 @@ def deletedfeedback():
 @app.route('/search', methods=['POST'])
 def search():
 	if request.method == 'POST':
-		search = request.form['search']
+		search = qntosafe(request.form['search'])
 		with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 			cur = conn.cursor()
 			result = cur.execute('SELECT title, categories FROM posts').fetchall()
@@ -598,7 +616,7 @@ def search():
 							</div>
 							<div style="margin: 15px 0px 15px 0px;" class="col-10">
 								<a href="/post/''' + result[0][0] + '''">
-									<h3>''' + result[0][0] + '''</h3>
+									<h3>''' + safetoqn(result[0][0]) + '''</h3>
 								</a>
 								<p>''' + result[0][3] + '''</p>
 							</div>
@@ -619,7 +637,7 @@ def search():
 						<div class="row">
 							<div style="margin: 15px 0px 15px 0px;" class="col-12">
 								<a href="/''' + i + '''">
-									<h3>''' + i + '''</h3>
+									<h3>''' + safetoqn(i) + '''</h3>
 								</a>
 							</div>
 						</div>
@@ -662,7 +680,7 @@ def serveFile(title):
 		#results[1] = results[1].replace('\r\n', '<br>')
 		content = '''
 		<div class='col-12 body'>
-		  <h1>''' + results[0] + '''</h1>
+		  <h1>''' + safetoqn(results[0]) + '''</h1>
 		</div>
 		<div id="editor" style="width: 100%;background-color: white;"></div>
 
@@ -701,7 +719,7 @@ def servePost(title):
 			categories = categories + '<a href="/category/' +  i + '">' + i + '</a>, '
 		categories = categories[:len(categories) - 2] + '</p>'
 
-		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + results[0][0] + "</h1><p>" + categories + '''</p></div>
+		content = "<div class='col-12 body' style='padding-bottom:5px;'><h1><img src='/static/files/" + results[0][4] + "' class='icon'>" + safetoqn(results[0][0]) + "</h1><p>" + categories + '''</p></div>
 
 		<div id="editor" style="width: 100%;background-color: white;"></div>
 
@@ -721,19 +739,25 @@ def servePost(title):
 		</script>'''
 		return render_template('content.html', content=Markup(content))
 
-@app.route('/test/<mode>/<title>')
-def test(mode, title):
+@app.route('/test')
+def test():
+	pass
+
+@app.route('/print/<mode>')
+def myprint(mode):
 	if mode == "posts":
 		with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 			cur = conn.cursor()
-			cur.execute('DELETE FROM posts where title==?;', (title,))
-			conn.commit()
-	else:
+			results = cur.execute("SELECT * FROM posts").fetchall()
+
+		return str(results[0])
+
+	elif mode == "pages":
 		with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 			cur = conn.cursor()
-			cur.execute('DELETE FROM pages where title==?;', (title,))
-			conn.commit()
-	return "done"
+			results = cur.execute("SELECT * FROM pages").fetchall()
+			
+		return str(results)
 
 
 if __name__ == "__main__":

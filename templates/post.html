@@ -24,7 +24,7 @@
         
         <div class="row">
           <div class="col-2"><a href="/posts">&lt;&lt; back</a></div>
-          <div class="col-8"><h2 style="text-align: center;"><b>Editing - {{title}}</b></h2></div>
+          <div class="col-8"><h2 style="text-align: center;"><b>Editing - {{title2}}</b></h2></div>
           <div class="col-2"></div>
         </div>
         <hr>
@@ -40,7 +40,7 @@
           <div class="input-group-prepend">
             <span class="input-group-text" id="id1">Title</span>
           </div>
-          <input type="text" name="title" class="form-control" aria-label="Default" id="title" aria-describedby="id1" value='{{ title }}' readonly>
+          <input type="text" name="title" class="form-control" aria-label="Default" id="title" aria-describedby="id1" value='{{ title2 }}' readonly>
         </div>
 
         <div class="input-group input-group-sm mb-3">
@@ -76,7 +76,7 @@
             <div class='container'>
               <div class='row'>
                 <div class='col-12' style='background-color: white;padding: 10px 15px;'>
-                  <h1><img src='/static/files/{{icon}}' class='icon'>{{ title }}</h1>
+                  <h1><img src='/static/files/{{icon}}' class='icon'>{{ title2 }}</h1>
                   <p><b>Categories:</b> <a id='catep' href='#preview'></a></p>
                 </div>
                     
@@ -86,7 +86,7 @@
           </div>
           <p>Start editing the left panel, your post will be rendered live as you edit.</p>
           <form action='/deletedpost' id="deletor" method='POST'>
-            <input type="text" value="{{title}}" name="title" style="display: none;">
+            <input type="text" value="{{title2}}" name="title" style="display: none;">
             <center><button form="deletor" type="submit" class="btn btn-outline-danger mt-3">Delete post</button></center>
           </form>
 

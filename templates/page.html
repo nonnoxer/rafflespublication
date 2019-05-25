@@ -20,7 +20,7 @@
         
         <div class="row">
           <div class="col-2"><a href="/pages">&lt;&lt; back</a></div>
-          <div class="col-8"><h2 style="text-align: center;"><b>Editing - {{title}}</b></h2></div>
+          <div class="col-8"><h2 style="text-align: center;"><b>Editing - {{title2}}</b></h2></div>
           <div class="col-2"></div>
         </div>
         <hr>
@@ -36,7 +36,7 @@
           <div class="input-group-prepend">
             <span class="input-group-text" id="id1">Title</span>
           </div>
-          <input type="text" name="title" class="form-control" aria-label="Default" id="title" aria-describedby="id1" value='{{ title }}' readonly>
+          <input type="text" name="title" class="form-control" aria-label="Default" id="title" aria-describedby="id1" value='{{ title2 }}' readonly>
         </div>
 
 
@@ -57,7 +57,7 @@
             <div class='container'>
               <div class='row'>
                 <div class='col-12' style='background-color: white;padding: 10px 15px;'>
-                  <h1>{{ title }}</h1>
+                  <h1>{{ title2 }}</h1>
                 </div>
                     
                 <div id='preview' style="width: 100%; background-color: white;"></div>
@@ -66,7 +66,7 @@
           </div>
           <p>Start editing the left panel, your page will be rendered live as you edit.</p>
           <form action='/deletedpage' id="deletor" method='POST'>
-            <input type="text" value="{{title}}" name="title" style="display: none;">
+            <input type="text" value="{{title2}}" name="title" style="display: none;">
             <center><button form="deletor" type="submit" class="btn btn-outline-danger mt-3">Delete page</button></center>
           </form>
 
