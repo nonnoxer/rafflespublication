@@ -7,7 +7,7 @@ import re
 import html
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get('SECRET_KEY', None)
 
 bigbigstring = os.path.dirname(os.path.realpath(__file__))
 
