@@ -7,7 +7,8 @@ import re
 import html
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', None)
+
+app.secret_key = "fixed"
 
 bigbigstring = os.path.dirname(os.path.realpath(__file__))
 
