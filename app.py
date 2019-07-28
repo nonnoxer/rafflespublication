@@ -158,6 +158,7 @@ def users():
 @app.route('/edituser/<username>')
 def edituser(username):
 	if 'user' in session:
+		username = html.unescape(username)
 		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
@@ -283,6 +284,8 @@ def posts():
 def editpost(title):
 	if 'user' in session:
 		if request.method == "GET":
+			title = html.unescape(title)
+
 			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
@@ -395,6 +398,7 @@ def pages():
 def editpage(title):
 	if 'user' in session:
 		if request.method == "GET":
+			title = html.unescape(title)
 			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
@@ -486,6 +490,7 @@ def categories():
 
 @app.route('/category/<category>')
 def category(category):
+	category = html.unescape(category)
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts;').fetchall()
@@ -675,18 +680,16 @@ def search():
 
 @app.route('/post/<title>')
 def servePost(title):
-	#print("OG string in search bar", repr(str(title)))
-
+	title = html.unescape(title)
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
-		#results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-		results = cur.execute('SELECT title FROM posts;').fetchall()
-	#print(repr(str(results)))
-	return Markup(title) + " || " + Markup(str(results))
+		results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+		#results = cur.execute('SELECT title FROM posts;').fetchall()
+	#return Markup(title) + " || " + Markup(str(results))
 	
 	if results == []:
-		return "THIS IS WIERD"
-		#return render_template('content.html', title='Error', content=Markup(errorstring))
+		#return "THIS IS WIERD"
+		return render_template('content.html', title='Error', content=Markup(errorstring))
 	else:
 		results[0] = list(results[0])
 		results[0][2] = results[0][2].replace('\r\n', '<br>')
@@ -739,6 +742,7 @@ def myprint(mode):
 
 @app.route('/<title>')
 def serveFile(title):
+	title = html.unescape(title)
 	with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
