@@ -683,9 +683,9 @@ def servePost(title):
 	title = html.unescape(title)
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
-		results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-		#results = cur.execute('SELECT title FROM posts;').fetchall()
-	#return Markup(title) + " || " + Markup(str(results))
+		#results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+		results = cur.execute('SELECT title FROM posts;').fetchall()
+	return Markup(title) + " || " + Markup(str(results))
 	
 	if results == []:
 		#return "THIS IS WIERD"
