@@ -677,7 +677,12 @@ def search():
 def servePost(title):
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
-		results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+		#results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+		results = str(cur.execute('SELECT title FROM posts;').fetchall())
+		results = results + " |||| " + title
+	print(results)
+	return results
+	"""
 	if results == []:
 		return "THIS IS WIERD"
 		#return render_template('content.html', title='Error', content=Markup(errorstring))
@@ -710,6 +715,7 @@ def servePost(title):
 			quill.setContents(deltaOps);
 		</script>'''
 		return render_template('content.html', content=Markup(content))
+	"""
 
 @app.route('/test')
 def test():
@@ -767,4 +773,4 @@ def serveFile(title):
 		#return str(results)
 
 if __name__ == "__main__":
-	app.run(debug=True,port="33",host="0.0.0.0")
+	app.run(debug=True)
