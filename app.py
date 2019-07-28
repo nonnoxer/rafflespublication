@@ -675,13 +675,14 @@ def search():
 
 @app.route('/post/<title>')
 def servePost(title):
+	#print("OG string in search bar", repr(str(title)))
+
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
-		results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-		#results = str(cur.execute('SELECT title FROM posts;').fetchall())
-		#results = results + " |||| " + title
-	#print(results)
-	#return results
+		#results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+		results = cur.execute('SELECT title FROM posts;').fetchall()
+	#print(repr(str(results)))
+	return Markup(title) + " || " + Markup(str(results))
 	
 	if results == []:
 		return "THIS IS WIERD"
