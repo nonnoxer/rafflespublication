@@ -673,41 +673,6 @@ def search():
 
 		return render_template('content.html', content=Markup(content))
 
-@app.route('/<title>')
-def serveFile(title):
-	with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
-		cur = conn.cursor()
-		results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
-	if results == []:
-		return render_template('content.html', title='Error', content=Markup(errorstring))
-	else:
-		results = list(results[0])
-		#results[1] = results[1].replace('\r\n', '<br>')
-		content = '''
-		<div class='col-12 body'>
-		  <h1>''' + safetoqn(results[0]) + '''</h1>
-		</div>
-		<div id="editor" style="width: 100%;background-color: white;"></div>
-
-		<p id="datasource" style="display: none;">''' + results[1] + '''</p>
-
-		<script type="text/javascript">
-			var quill = new Quill('#editor', {
-			theme: 'bubble',
-			"modules": {
-				"toolbar": false,
-			},
-			readOnly: true,
-			});
-			mystring = document.getElementById("datasource").textContent;
-			var mydelta = JSON.parse(mystring);
-			var deltaOps =  mydelta["ops"];
-			quill.setContents(deltaOps);
-
-		</script>'''
-		return render_template('content.html', content=Markup(content))
-		#return str(results)
-
 @app.route('/post/<title>')
 def servePost(title):
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
@@ -765,6 +730,40 @@ def myprint(mode):
 			
 		return str(results)
 
+@app.route('/<title>')
+def serveFile(title):
+	with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
+		cur = conn.cursor()
+		results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
+	if results == []:
+		return render_template('content.html', title='Error', content=Markup(errorstring))
+	else:
+		results = list(results[0])
+		#results[1] = results[1].replace('\r\n', '<br>')
+		content = '''
+		<div class='col-12 body'>
+		  <h1>''' + safetoqn(results[0]) + '''</h1>
+		</div>
+		<div id="editor" style="width: 100%;background-color: white;"></div>
+
+		<p id="datasource" style="display: none;">''' + results[1] + '''</p>
+
+		<script type="text/javascript">
+			var quill = new Quill('#editor', {
+			theme: 'bubble',
+			"modules": {
+				"toolbar": false,
+			},
+			readOnly: true,
+			});
+			mystring = document.getElementById("datasource").textContent;
+			var mydelta = JSON.parse(mystring);
+			var deltaOps =  mydelta["ops"];
+			quill.setContents(deltaOps);
+
+		</script>'''
+		return render_template('content.html', content=Markup(content))
+		#return str(results)
 
 if __name__ == "__main__":
 	app.run(debug=True,port="33",host="0.0.0.0")
