@@ -679,7 +679,8 @@ def servePost(title):
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
 	if results == []:
-		return render_template('content.html', title='Error', content=Markup(errorstring))
+		return "THIS IS WIERD"
+		#return render_template('content.html', title='Error', content=Markup(errorstring))
 	else:
 		results[0] = list(results[0])
 		results[0][2] = results[0][2].replace('\r\n', '<br>')
