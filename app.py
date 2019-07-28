@@ -5,6 +5,7 @@ from passlib.hash import sha256_crypt
 from werkzeug.utils import secure_filename
 import re
 import html
+import urllib.parse
 
 app = Flask(__name__)
 
@@ -158,7 +159,7 @@ def users():
 @app.route('/edituser/<username>')
 def edituser(username):
 	if 'user' in session:
-		username = html.unescape(username)
+		username = urllib.parse.unquote(username)
 		with sql.connect(os.path.join(bigbigstring,'databases/users.db')) as conn:
 			cur = conn.cursor()
 			results = cur.execute('SELECT username FROM users WHERE username==?;', (username,)).fetchone()
@@ -284,8 +285,7 @@ def posts():
 def editpost(title):
 	if 'user' in session:
 		if request.method == "GET":
-			title = html.unescape(title)
-
+			title = urllib.parse.unquote(title)
 			with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
@@ -398,7 +398,7 @@ def pages():
 def editpage(title):
 	if 'user' in session:
 		if request.method == "GET":
-			title = html.unescape(title)
+			title = urllib.parse.unquote(title)
 			with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 				cur = conn.cursor()
 				results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
@@ -490,7 +490,7 @@ def categories():
 
 @app.route('/category/<category>')
 def category(category):
-	category = html.unescape(category)
+	category = urllib.parse.unquote(category)
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM posts;').fetchall()
@@ -680,12 +680,12 @@ def search():
 
 @app.route('/post/<title>')
 def servePost(title):
-	title = html.unescape(title)
+	title = urllib.parse.unquote(title)
 	with sql.connect(os.path.join(bigbigstring,'databases/posts.db')) as conn:
 		cur = conn.cursor()
-		#results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
-		results = cur.execute('SELECT title FROM posts;').fetchall()
-	return Markup(title) + " || " + Markup(str(results))
+		results = cur.execute('SELECT * FROM posts WHERE title==?;', (title,)).fetchall()
+		#results = cur.execute('SELECT title FROM posts;').fetchall()
+	#return Markup(title) + " || " + Markup(str(results))
 	
 	if results == []:
 		#return "THIS IS WIERD"
@@ -742,7 +742,7 @@ def myprint(mode):
 
 @app.route('/<title>')
 def serveFile(title):
-	title = html.unescape(title)
+	title = urllib.parse.unquote(title)
 	with sql.connect(os.path.join(bigbigstring,'databases/pages.db')) as conn:
 		cur = conn.cursor()
 		results = cur.execute('SELECT * FROM pages WHERE title==?;', (title,)).fetchall()
