@@ -9,6 +9,7 @@ import urllib.parse
 
 app = Flask(__name__)
 
+
 app.secret_key = "fixed"
 
 bigbigstring = os.path.dirname(os.path.realpath(__file__))
